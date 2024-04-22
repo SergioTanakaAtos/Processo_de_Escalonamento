@@ -30,16 +30,13 @@ class UserGroupDefault(models.Model):
     is_visualizer = models.BooleanField(default=False)
     group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='usergroupdefaults')
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usergroupdefaults')
-    
+    def save(self, *args, **kwargs):
+        user = User.objects.get(id=self.user_id)
+        if user.is_superuser or user.is_staff:
+            self.is_visualizer = True
+        super().save(*args, **kwargs)
 class Log_permission(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_permissions')
     group_id = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='log_permissions')
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-
-
-
-@receiver(pre_save, sender=User)
-def set_is_visualizer(sender, instance, **kwargs):
-    if instance.is_superuser or instance.is_staff:
-        instance.usergroupdefault.is_visualizer = True
