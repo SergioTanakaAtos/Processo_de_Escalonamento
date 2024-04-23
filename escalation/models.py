@@ -29,7 +29,7 @@ class UserGroupDefault(models.Model):
     is_visualizer = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='usergroupdefaults')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usergroupdefaults')
-    
+
 class Log_permission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_permissions')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='log_permissions')
