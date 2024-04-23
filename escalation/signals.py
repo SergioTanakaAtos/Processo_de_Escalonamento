@@ -1,10 +1,8 @@
-# escalation/signals.py
-
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
-from .models import UserGroupDefault
 from django.contrib.auth.models import Group
+from .models import UserGroupDefault
 
 @receiver(post_save, sender=User)
 def update_usergroup_default(sender, instance, created, **kwargs):
@@ -33,5 +31,4 @@ def update_existing_superusers_and_staff(sender, instance, created, **kwargs):
                 user_group_default.is_visualizer = True
                 user_group_default.save()
 
-# Registrar o sinal para atualizar superusuários e staff existentes quando um novo grupo é criado
 post_save.connect(update_existing_superusers_and_staff, sender=Group)

@@ -30,8 +30,8 @@ class UserGroupDefault(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='usergroupdefaults')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usergroupdefaults')
 
-class Log_permission(models.Model):
+class LogPermission(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_permissions')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='log_permissions')
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
