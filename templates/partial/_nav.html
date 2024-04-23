@@ -13,12 +13,14 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#">Empresas</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Permissões</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Controle de acesso</a>
-                </li>
+                {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Permissões</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Controle de acesso</a>
+                    </li>
+                {% endif %} 
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
