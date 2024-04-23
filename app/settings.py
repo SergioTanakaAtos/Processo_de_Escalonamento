@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'users.apps.UsersConfig',
     'escalation.apps.EscalationConfig',
+    'permissions.apps.PermissionsConfig',
+    
 ]
 
 MIDDLEWARE = [
