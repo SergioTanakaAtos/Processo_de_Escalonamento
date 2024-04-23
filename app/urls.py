@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include("users.urls")),
     path('escalation/',include("escalation.urls")),
+    path('permission/', include("permissions.url"))
 
 ]
