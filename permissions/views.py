@@ -1,3 +1,7 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 
-# Create your views here.
+
+
+def permissions(request):
+    return render(request, 'permission.html')
