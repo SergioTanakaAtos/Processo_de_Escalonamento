@@ -1,10 +1,69 @@
 {% extends "base.html" %}
 
+{% comment %} <style>
+    {% block style %}
+    
+    .box-card-permission{
+        display: flex;
+    }
+    
+
+    {% endblock style %}
+</style> {% endcomment %}
+
 
 {% block content %}
 
-    <h1>Permissões</h1>
-
     
+    <div class="container">
+
+            
+            <h1>Permissões</h1>
+
+            
+            {% for p in permissions %}
+                
+                <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+
+
+                    {% if admin %}
+
+                        <div class="desc-permission">
+                            <p>
+                                <b>{{ p.user}}</b> pede solicitação para: <br>
+                                {{ p.group}}
+                            </p>
+                        </div>    
+
+                        <div class="buttons-permissions">
+                            <a class="btn btn-primary" href="#" role="button">Confirmar</a>
+                            <a class="btn btn-primary" href="#" role="button">Recusar</a>
+                        </div>
+                        
+                    
+                    {% else  %}
+
+                        <div class="desc-permission">
+                            <p>
+                                <b>Solicitação de acesso para: <br>
+                                {{ p.group}}
+                            </p>
+                        </div>    
+
+                        <div class="buttons-permissions">
+                            <a class="btn btn-primary" href="#" role="button">Confirmar</a>
+                            <a class="btn btn-primary" href="#" role="button">Recusar</a>
+                        </div>
+
+                    {% endif %}
+                    
+                 
+                    
+
+                </div>
+            {% endfor %}
+     
+    </div>
+   
 
 {% endblock content %}

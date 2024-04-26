@@ -5,7 +5,8 @@
 <div class="container">
   <h1>Tabela de Dados</h1>
   <div class="d-flex mb-3"> 
-    <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;">    <button id="addButton" class="btn btn-primary">Adicionar</button>
+    <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;">    
+    <button id="addButton" class="btn btn-primary">Adicionar</button>
   </div>
 
   <table id="dataTable" class="table table-striped">
@@ -20,6 +21,7 @@
       <tr>
         <td><a href="{% url 'escalation' group_id=group.id user_id=request.user.id %}">{{ group }}</a></td> 
         <td class="{% if state == 'Permitido' %} bg-success {% elif state == 'Permissão pendente' %} bg-warning {% elif state == 'Não pediu permissão' %} bg-danger {% endif %}">{{ state }}</td> 
+        <td><a href="{% url 'create-permission' group_id=group.id%}">Solicitar</a></td> 
       </tr>
       {% endfor %}
     </tbody>
