@@ -1,0 +1,39 @@
+{% extends "base.html" %} 
+{% block content %}
+
+<div class="container">
+    <h2>Escalonamento > {{ group.name }}</h2>
+
+<div class="d-flex mb-3">
+    <a
+        href="{% url 'create_escalation' group_id=group.id %}"
+        class="btn btn-primary"
+        >Adicionar Escalonamento</a
+    >
+</div>
+
+    <table id="escalationTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Telefone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if message %} 
+                <tr>
+                    <td colspan="2">{{ message }}</td>
+                </tr>
+            {% else %}
+                {% for item in escalation %}
+                    <tr>
+                        <td>A</td>
+                        <td>B</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

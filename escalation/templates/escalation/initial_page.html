@@ -12,12 +12,14 @@
     <thead>
       <tr>
         <th>Empresa</th>
+        <th>Estado</th> 
       </tr>
     </thead>
     <tbody>
-      {% for group in groups %}
+      {% for group, state in group_states.items %}
       <tr>
-        <td><a href="{% url 'escalation' group_id=group.id user_id=user.id %}">{{ group }}</a></td>
+        <td><a href="{% url 'escalation' group_id=group.id user_id=request.user.id %}">{{ group }}</a></td> 
+        <td class="{% if state == 'Permitido' %} bg-success {% elif state == 'Permissão pendente' %} bg-warning {% elif state == 'Não pediu permissão' %} bg-danger {% endif %}">{{ state }}</td> 
       </tr>
       {% endfor %}
     </tbody>
