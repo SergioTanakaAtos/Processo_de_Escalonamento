@@ -36,8 +36,8 @@
                         </div>    
 
                         <div class="buttons-permissions">
-                            <a class="btn btn-primary" href="#" role="button">Confirmar</a>
-                            <a class="btn btn-primary" href="#" role="button">Recusar</a>
+                            <a class="btn btn-primary" href="{% url 'accepted' permission_id=p.id%}" role="button">Confirmar</a>
+                            <a class="btn btn-primary" href="{% url 'denied' permission_id=p.id %}" role="button">Recusar</a>
                         </div>
                         
                     
@@ -51,7 +51,7 @@
                         </div>    
 
                         <div class="buttons-permissions">
-                            <a class="btn btn-primary" href="#" role="button">Confirmar</a>
+                            <a class="btn btn-primary" href="{% url '' %}" role="button">Confirmar</a>
                             <a class="btn btn-primary" href="#" role="button">Recusar</a>
                         </div>
 
