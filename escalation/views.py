@@ -1,12 +1,15 @@
 from django.shortcuts import render
+from django.shortcuts import redirect
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from .models import Escalation
 from .models import UserGroupDefault
 from .models import LogPermission
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
 
 from django.http import HttpResponseForbidden
+from django.http import HttpResponse    
 # Create your views here.
 def initial_page(request):
     #pylint: disable=E1101
@@ -26,6 +29,16 @@ def initial_page(request):
         group_states[group] = states_mapping.get(log_per.is_active, "Não pediu permissão")
     return render(request, 'escalation/initial_page.html', {'group_states': group_states})
 
+@csrf_exempt
+def save_group(request):
+    user = request.user
+    if user.is_superuser or user.is_staff:
+        if request.method == 'POST':
+            group_name = request.POST.get('group_name')
+            group = Group(name=group_name)
+            group.save()
+            return HttpResponse(200, 'Grupo criado com sucesso.')
+            
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
@@ -49,12 +62,16 @@ def create_escalation(request, group_id):
     
     if request.method == 'POST':
         name = request.POST.get('name')
-        position = request.POST.get('position')
-        phone = request.POST.get('phone')
-        email = request.POST.get('email')
-        level = request.POST.get('level')
-        area = request.POST.get('area')
-        service = request.POST.get('service')
-        escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
-        escalation.save()
+        if Escalation.objects.filter(group=group, name=name).exists():
+            return redirect('escalation/create_escalation.html', {'group': group, 'message': 'Já existe um escalonamento com este nome.'})
+        else:
+            position = request.POST.get('position')
+            phone = request.POST.get('phone')
+            email = request.POST.get('email')
+            area = request.POST.get('area')
+            service = request.POST.get('service')
+            level = request.POST.get('level')
+            escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
+            
+            escalation.save()
     return render(request, 'escalation/create_escalation.html', {'group': group})
