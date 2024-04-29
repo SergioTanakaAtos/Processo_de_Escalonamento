@@ -38,6 +38,16 @@ def save_group(request):
             group = Group(name=group_name)
             group.save()
             return HttpResponse(200, 'Grupo criado com sucesso.')
+    return HttpResponse(403, {'message':'Você não tem permissão para criar grupos.'})
+
+def edit_group(request, group_id):
+    #pylint: disable=E1101
+    group = Group.objects.get(id=group_id)
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+        group.name = group_name
+        group.save()
+        return redirect('initial_page')
             
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
