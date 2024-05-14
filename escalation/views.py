@@ -7,9 +7,10 @@ from .models import UserGroupDefault
 from .models import LogPermission
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import user_passes_test
 
 from django.http import HttpResponseForbidden
-from django.http import HttpResponse    
+from django.http import JsonResponse    
 # Create your views here.
 def initial_page(request):
     #pylint: disable=E1101
@@ -30,25 +31,32 @@ def initial_page(request):
     return render(request, 'escalation/initial_page.html', {'group_states': group_states})
 
 @csrf_exempt
+@user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def save_group(request):
-    user = request.user
-    if user.is_superuser or user.is_staff:
-        if request.method == 'POST':
-            group_name = request.POST.get('group_name')
-            group = Group(name=group_name)
-            group.save()
-            return HttpResponse(200, 'Grupo criado com sucesso.')
-    return HttpResponse(403, {'message':'Você não tem permissão para criar grupos.'})
-
-def edit_group(request, group_id):
-    #pylint: disable=E1101
-    group = Group.objects.get(id=group_id)
     if request.method == 'POST':
         group_name = request.POST.get('group_name')
-        group.name = group_name
+        if group_name:
+            group_name_lower = group_name.lower()
+            if Group.objects.filter(name__iexact=group_name_lower).exists():
+                return JsonResponse({'message':'O nome do grupo já existe.'}, status=400)
+            group = Group(name=group_name)
+            group.save()
+            return JsonResponse({'message':'Grupo criado com sucesso.'}, status=200)
+        else:
+            return JsonResponse({'message':'O nome do grupo não pode estar vazio.'}, status=400)
+    return JsonResponse({'message':'Método não permitido.'}, status=405)
+@csrf_exempt
+@user_passes_test(lambda u: u.is_superuser or u.is_staff)
+def edit_group(request):
+    if request.method == 'POST':
+        group_id = request.POST.get('group_id')
+        new_group_name = request.POST.get('new_company')
+        group = Group.objects.get(id=group_id)
+        group.name = new_group_name
         group.save()
-        return redirect('initial_page')
-            
+        return JsonResponse({'message':'Grupo criado com sucesso.'}, status=200)
+    
+    return render(request, 'initial_page.html')     
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
@@ -84,4 +92,6 @@ def create_escalation(request, group_id):
             escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
             
             escalation.save()
+        
+            return render(request, 'escalation/create_escalation.html', {'group': group})
     return render(request, 'escalation/create_escalation.html', {'group': group})

@@ -20,11 +20,20 @@
     </thead>
     <tbody>
       {% for group, state in group_states.items %}
-      <tr>
-        <td><a id="group_{{ group.id }}" href="{% url 'escalation' group_id=group.id user_id=request.user.id %}">{{ group }}</a></td> 
-        <td class="{% if state == 'Permitido' %} bg-success {% elif state == 'Permissão pendente' %} bg-warning {% elif state == 'Não pediu permissão' %} bg-danger {% endif %}">{{ state }}</td> 
-        <td><a href="{% url 'create-permission' group_id=group.id%}">Solicitar</a></td> 
-        <td> Editar</td>
+      <tr id="group_row_{{ group.id }}">
+        <td class="editable" data-group-id="{{ group.id }}">{{ group }}</td>
+        <td class="{% if state == 'Permitido' %} bg-success {% elif state == 'Permissão pendente' %} bg-warning {% elif state == 'Não pediu permissão' %} bg-danger {% endif %}">{{ state }}</td>
+        <td><a href="{% url 'create-permission' group_id=group.id%}">Solicitar</a></td>
+        <td>
+            <div class="edit-controls">
+                <button class="btn btn-primary edit-button" data-group-id="{{ group.id }}">Editar</button>
+                <button class="btn btn-success confirm-button" style="display: none;">Confirmar</button>
+                <button class="btn btn-danger cancel-button" style="display: none;">Cancelar</button>
+            </div>
+            <div class="edit-field" style="display: none;">
+                <input type="text" class="form-control edited-company" value="{{ group }}" data-original-value="{{ group }}" />
+            </div>
+        </td>
       </tr>
       {% endfor %}
     </tbody>
@@ -52,27 +61,92 @@
   </div>
 </div>
 
-<script>
-  document.getElementById("addButton").addEventListener("click", function() {
-    $('#myModal').modal('show');
-  });
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-  document.getElementById("saveGroup").addEventListener("click", function() {
-    var newGroupName = document.getElementById("newGroupName").value;
-    $.ajax({
-      type: "POST",
-      url: "{% url 'save_group' %}",
-      data: {
-        group_name: newGroupName,
-        csrfmiddlewaretoken: "{{ csrf_token }}"
-      },
-      success: function(data) {
-        window.location.reload();
-      },
-      error: function(xhr, errmsg, err) {
-        console.log(xhr.status + ": " + xhr.responseText); 
-      }
+<script>
+  $(document).ready(function () {
+    document.getElementById("addButton").addEventListener("click", function() {
+      $('#myModal').modal('show');
+    });
+
+    document.getElementById("saveGroup").addEventListener("click", function() {
+      var newGroupName = document.getElementById("newGroupName").value;
+      $.ajax({
+        type: "POST",
+        url: "{% url 'save_group' %}",
+        data: {
+          group_name: newGroupName,
+          csrfmiddlewaretoken: "{{ csrf_token }}"
+        },
+        success: function(data) {
+          window.location.reload();
+        },
+        error: function(xhr, errmsg, err) {
+          console.log(xhr.status + ": " + xhr.responseText); 
+        }
+      });
+    });
+
+    $("#searchInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $("#dataTable tbody tr").each(function() {
+        var empresa = $(this).find("td:first-child").text().toLowerCase();
+        if (empresa.includes(value)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    });
+
+    $(".edit-button").click(function () {
+        var groupId = $(this).data("group-id");
+        var row = $("#group_row_" + groupId);
+
+        row.find(".edit-button").hide();
+        row.find(".confirm-button, .cancel-button").show();
+
+        var companyName = row.find(".editable");
+        companyName.attr("contenteditable", "true");
+        companyName.focus();
+    });
+
+    $(".confirm-button").click(function () {
+        var groupId = $(this).closest("tr").attr("id").split("_")[2];
+        var row = $("#group_row_" + groupId);
+        var newCompany = row.find(".editable").text();
+
+        $.ajax({
+            url: "{% url 'edit_group' %}",
+            type: "POST",
+            data: {
+                group_id: groupId,
+                new_company: newCompany,
+                csrfmiddlewaretoken: "{{ csrf_token }}",
+            },
+            success: function (response) {
+                row.find(".editable").text(newCompany);
+                row.find(".edit-controls").show(); 
+                row.find(".edit-field").hide();
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+                row.find(".editable").attr("contenteditable", "false");
+                row.find(".edit-controls").show(); 
+                row.find(".edit-field").hide();
+            },
+        });
+    });
+
+    $(".cancel-button").click(function () {
+        var groupId = $(this).closest("tr").attr("id").split("_")[2];
+        var row = $("#group_row_" + groupId);
+
+        row.find(".editable").attr("contenteditable", "false");
+        row.find(".edit-controls").show();
+        row.find(".edit-field").hide();
     });
   });
 </script>
+
 {% endblock %}
