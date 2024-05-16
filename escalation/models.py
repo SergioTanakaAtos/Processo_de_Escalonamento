@@ -14,6 +14,7 @@ class Escalation(models.Model):
     level = models.IntegerField()
     area = models.CharField(max_length=100)
     service = models.CharField(max_length=100)
+    is_used = models.BooleanField(default=False)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='escalations')
 
     def __str__(self):
