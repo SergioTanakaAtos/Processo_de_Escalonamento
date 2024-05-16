@@ -21,7 +21,7 @@
     <tbody>
       {% for group, state in group_states.items %}
       <tr id="group_row_{{ group.id }}">
-        <td class="editable" data-group-id="{{ group.id }}">{{ group }}</td>
+        <td class="editable" data-group-id="{{ group.id }}"><a href={%url 'escalation' group_id=group.id user_id=user.id%}>{{ group }}</a></td>
         <td class="{% if state == 'Permitido' %} bg-success {% elif state == 'Permissão pendente' %} bg-warning {% elif state == 'Não pediu permissão' %} bg-danger {% endif %}">{{ state }}</td>
         <td><a href="{% url 'create-permission' group_id=group.id%}">Solicitar</a></td>
         <td>
