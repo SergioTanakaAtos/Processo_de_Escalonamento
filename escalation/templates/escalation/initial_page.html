@@ -128,6 +128,7 @@
                 row.find(".editable").text(newCompany);
                 row.find(".edit-controls").show(); 
                 row.find(".edit-field").hide();
+                window.location.reload();
             },
             error: function (xhr, status, error) {
                 console.error(error);
@@ -145,6 +146,7 @@
         row.find(".editable").attr("contenteditable", "false");
         row.find(".edit-controls").show();
         row.find(".edit-field").hide();
+        window.location.reload();
     });
   });
 </script>
