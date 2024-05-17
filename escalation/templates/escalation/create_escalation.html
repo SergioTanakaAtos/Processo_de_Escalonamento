@@ -1,11 +1,55 @@
 {% extends 'base.html'%}
 {% block content %}
 <div class="container">
+    
+
     <h1>Adicionar Escalonamento</h1>
+
+
     <form method="POST">
         {% csrf_token %}
         <div class="form-group">
-            
+            <form action="{% url 'create_escalation' group_id=group.id %}" method="post">
+                
+                <div class="mb-3">
+                    <label for="name" class="form-label">Nome: </label>
+                    <input type="text" class="form-control" id="name" placeholder="Digite o nome" name="name">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email: </label>
+                    <input type="email" class="form-control" id="email" placeholder="Digite o email" name="email">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="position" class="form-label">Cargo: </label>
+                    <input type="text" class="form-control" id="position" placeholder="Digite a posição" name="position">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="phone" class="form-label">Telefone: </label>
+                    <input type="text" class="form-control" id="phone" placeholder="Digite o telefone" name="phone">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="area" class="form-label">Área: </label>
+                    <input type="text" class="form-control" id="area" placeholder="Digite a área" name="area">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="service" class="form-label">Serviço: </label>
+                    <input type="text" class="form-control" id="service" placeholder="Digite o serviço" name="service">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="level" class="form-label">Nível: </label>
+                    <input type="text" class="form-control" id="level" placeholder="Digite o nível" name="level">
+                </div>
+                
+
+                <button type="submit" class="btn btn-primary">Salvar</button>
+
+            </form>
 
         </div>
     </form>

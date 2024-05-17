@@ -116,6 +116,8 @@ def escalation(request, group_id, user_id):
         return render(request, 'escalation/escalation_page.html', {'group': group, 'message': "Não há escalonamento cadastrado para este grupo."})
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
 
+
+
 def create_escalation(request, group_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)

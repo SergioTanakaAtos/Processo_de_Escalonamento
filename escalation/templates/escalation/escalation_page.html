@@ -8,52 +8,39 @@
     </div>
 
     <table id="escalationTable" class="table table-striped">
+
+      {% if message %}
+      <tr>
+        <td colspan="2">{{ message }}</td>
+      </tr>
+    {% else %}
       <thead>
         <tr>
           <th>Nome</th>
+          <th>Cargo</th>
+          <th>Área</th>
+          <th>Email</th>
           <th>Telefone</th>
+          <th>Nível</th>
+          <th>Serviço</th>
         </tr>
       </thead>
       <tbody>
-        {% if message %}
-          <tr>
-            <td colspan="2">{{ message }}</td>
-          </tr>
-        {% else %}
           {% for item in escalation %}
             <tr>
-              <td>{{ item }}</td>
+              <td>{{ item.name }}</td>
+              <td>{{ item.position }}</td>
+              <td>{{ item.area }}</td>
+              <td>{{ item.email }}</td>
+              <td>{{ item.phone }}</td>
+              <td>{{ item.level }}</td>
+              <td>{{ item.service }}</td>
+              <td><button type="button" class="btn btn-primary">Editar</button></td>
             </tr>
           {% endfor %}
-        {% endif %}
       </tbody>
+      {% endif %}
     </table>
   </div>
 
-  <div class="modal" tabindex="-1">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Modal title</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p>Modal body text goes here.</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Save changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const myModal = document.getElementById('myModal')
-    const myInput = document.getElementById('myInput')
-    
-    myModal.addEventListener('shown.bs.modal', () => {
-      myInput.focus()
-    })
-  </script>
 {% endblock %}
