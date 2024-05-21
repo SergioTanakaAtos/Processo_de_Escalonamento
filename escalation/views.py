@@ -125,7 +125,7 @@ def create_escalation(request, group_id):
     if request.method == 'POST':
         name = request.POST.get('name')
         if Escalation.objects.filter(group=group, name=name).exists():
-            return redirect('escalation/create_escalation.html', {'group': group, 'message': 'Já existe um escalonamento com este nome.'})
+            return render(request,'escalation/create_escalation.html', {'group': group, 'message': 'Já existe um escalonamento com este nome.'})
         else:
             position = request.POST.get('position')
             phone = request.POST.get('phone')

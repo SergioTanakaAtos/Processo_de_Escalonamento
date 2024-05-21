@@ -6,11 +6,11 @@
   <div class="d-flex mb-3"> 
     <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;">    
     <button id="addButton" class="btn btn-primary">Adicionar</button>
-    <form action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
+    {% comment %} <form action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         <input type="file" name="csv_file" accept=".csv" required>
         <button type="submit">Enviar</button>
-    </form>
+    </form> {% endcomment %}
     {% if message %}
       <div class="alert ml-3" role="alert">{{ message }}</div>
     {% endif %}
