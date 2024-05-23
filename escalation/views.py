@@ -16,15 +16,6 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
-# Create your views here.
-
-from collections import defaultdict
-from django.shortcuts import render
-from .models import Escalation
-from anytree import Node, RenderTree
-from anytree.exporter import DotExporter
-import graphviz
-from collections import defaultdict
 
 def initial_page(request):
     #pylint: disable=E1101
@@ -114,7 +105,6 @@ def escalation(request, group_id, user_id):
     
 
     escalation = Escalation.objects.filter(group=group)
-    escalation_tree()
     if not escalation:
         return render(request, 'escalation/escalation_page.html', {'group': group, 'message': "Não há escalonamento cadastrado para este grupo."})
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
@@ -144,53 +134,3 @@ def create_escalation(request, group_id):
     return render(request, 'escalation/create_escalation.html', {'group': group})
 
 
-
-def escalation_tree():
-    # pylint: disable=E1101\w
-    escalation = Escalation.objects.order_by('level')
-    tree = defaultdict(list)
-    for esc in escalation:
-        tree[esc.level].append(esc.name)
-
-    # Convertendo o defaultdict para um dicionário normal
-    tree = dict(tree)
-    print(tree)
-
-    # Construindo a árvore com anytree
-    root = Node("Escalation")
-
-    # Dicionário para armazenar os nós por nível
-    nodes = {0: root}
-    for level in sorted(tree.keys()):
-        for name in tree[level]:
-            # Cada nó é filho do nível anterior
-            parent = nodes[level - 1]
-            nodes[level] = Node(name, parent=parent)
-
-    # Exportando a árvore para um arquivo DOT
-    DotExporter(root).to_dotfile("tree.dot")
-
-    # Convertendo o arquivo DOT para um gráfico SVG usando graphviz
-    with open("tree.dot") as f:
-        dot_graph = f.read()
-    graph = graphviz.Source(dot_graph)
-    graph.render("tree", format="svg", cleanup=True)
-
-    # Gerar o conteúdo HTML para visualizar a árvore
-    html_content = """
-
-        <h1>Escalation Tree Visualization</h1>
-        <img src="/static/tree.svg" alt="Tree Visualization">
-    </body>
-    </html>
-    """
-
-    # Salvando o HTML em um arquivo
-    with open("templates/tree.html", "w") as file:
-        file.write(html_content)
-
-    return "tree.html"
-
-def tree_view(request):
-    html_file = escalation_tree()
-    return render(request, html_file)
