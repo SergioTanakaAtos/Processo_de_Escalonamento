@@ -94,7 +94,7 @@
         transition: ease-in-out 0.3s;
     }
  
-    .btn1>a{
+    .btn1>a {
         text-decoration: none;
         color: #073958;
     }
@@ -104,7 +104,7 @@
         color: white;
     }
  
-    .entreNegrito>a{
+    .entreNegrito>a {
         color: #073958;
         text-decoration: none;
     }
@@ -116,40 +116,33 @@
             <form id="cadastroForm" method="post" action="{% url 'register' %}">
                 {% csrf_token %}
                 <div class="form-group mb-3">
-                    <label for="nome" class="d-block">Nome:</label>
-                    <input type="text" class="form-control" id="nome" name="nome">
+                    <label for="{{ form.first_name.id }}" class="d-block">{{ form.first_name.label }}:</label>
+                    {{ form.first_name }}
                 </div>
                 <div class="form-group mb-3">
-                    <label for="usuario" class="d-block">Usuário:</label>
-                    <input type="text" class="form-control" id="usuario" name="usuario">
+                    <label for="{{ form.email.id }}" class="d-block">{{ form.email.label }}:</label>
+                    {{ form.email }}
                 </div>
                 <div class="form-group mb-3">
-                    <label for="email" class="d-block">E-mail:</label>
-                    <input type="email" class="form-control" id="email" name="email">
+                    <label for="{{ form.password1.id }}" class="d-block">{{ form.password1.label }}:</label>
+                    {{ form.password1 }}
                 </div>
                 <div class="form-group mb-3">
-                    <label for="senha" class="d-block" id="senhaLabel">Senha:</label>
-                    <input type="password" class="form-control" id="senha" name="senha">
+                    <label for="{{ form.password2.id }}" class="d-block">{{ form.password2.label }}:</label>
+                    {{ form.password2 }}
                 </div>
-                <div class="form-group mb-3">
-                    <label for="confirmarSenha" class="d-block" id="senhaLabel">Confirmar senha:</label>
-                    <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha">
-                </div>
-                <div class="permission">
-                    <label class="multiple">Permissão:</label><br>
-                    <select multiple name="native-select" data-search="false" data-silent-initial-value-set="true" name="permissao">
-                        <option value="allianz">Allianz</option>
-                        <option value="hdmi">HDMI</option>
-                        <option value="b3">B3</option>
-                        <option value="toyota">Toyota</option>
- 
+                <div class="form-group mb-3 permission">
+                    <label for="{{ form.permissions.id_for_label }}" class="d-block">{{ form.permissions.label }}:</label>
+                    <select multiple name="{{ form.permissions.name }}" id="{{ form.permissions.id_for_label }}">
+                        {% for group in form.permissions.field.queryset %}
+                            <option value="{{ group.id }}" {% if group in form.permissions.value %}selected{% endif %}>{{ group }}</option>
+                        {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="mt-3 w-100 btn btn-primary" onclick="cadastrar()">Cadastrar</button>
+                <button type="submit" class="mt-3 w-100 btn btn-primary">Cadastrar</button>
             </form>
             <div class="text-center fraseEntrar mt-1">
-                <p>Já possui uma conta? <span class="entreNegrito"
-                        style="font-weight: bold; cursor: pointer; color: #073958"><a href={% url "login" %}>Entre!</a></span></p>
+                <p>Já possui uma conta? <span class="entreNegrito" style="font-weight: bold; cursor: pointer; color: #073958"><a href="{% url 'login' %}">Entre!</a></span></p>
             </div>
         </div>
     </div>
@@ -157,12 +150,13 @@
 <div class="logoAtosDeveloped text-center mt-5">
     <img src="{% static 'assets/image (1).png' %}">
 </div>
- 
-<script src="{%static 'js/virtual-select.min.js' %}"></script>
+
+<script src="{% static 'js/virtual-select.min.js' %}"></script>
 <script type="text/javascript">
     VirtualSelect.init({
         ele: 'select'
-    });</script>
+    });
+</script>
 {% endblock content %}
  
 {% block link_style %}

@@ -5,27 +5,42 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from escalation.models import LogPermission
 from django.contrib.auth.models import Group
-
- 
+from .registerForm import RegisterForm
 def register(request):
+    form = RegisterForm()
     if request.method == 'POST':
-        nome = request.POST.get('nome')
-        usuario = request.POST.get('usuario')
-        email = request.POST.get('email')
-        senha = request.POST.get('senha')
-        permissoes = request.POST.getlist('permissao')
-        confirmar_senha = request.POST.get('confirmarSenha')
- 
-        if senha != confirmar_senha:
-            return render(request, 'users/register.html', {'error': 'As senhas não coincidem!'})
- 
-        if not email.endswith('@atos.net'):
-           return render(request, 'users/register.html', {'error': 'O e-mail fornecido não é válido'})
-        user = User.objects.create_user(usuario, email, senha)
-        user.save()
-        return render(request, 'users/login.html')
-    
-    return render(request, 'users/register.html')
+        form = RegisterForm(request.POST)
+        print(form)
+        if form.is_valid():
+
+            # form.save()
+            # user = User.objects.get(name=)
+            # for group in form.cleaned_data['permissions']:
+            #     LogPermission.objects.create(user=user, group=group)
+            return redirect('initial_page')
+        """
+
+        Relacionamento
+
+        Instanciar a tebala logpermission com o id das permissoes juntamente com o novo id user e setar o is_active como null(não nessesariamente é aqui que se faz isso, ver melhor depois)
+        
+        Instaciar a tabela usergroupdefault com o id do grupo e o id do user para criar esse relacionamento False
+        is_active -
+
+            False: não pediu permissão
+
+            null: Permissão pendente
+
+            True: Permitido
+
+        |
+
+        |
+
+        V verificar se está certo a maneira de salvar o nome.
+
+        """    
+    return render(request, 'users/register.html', {'form': form})
  
 def login(request):
     if request.method == 'POST':
