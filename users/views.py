@@ -1,46 +1,25 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
 from django.http import JsonResponse
 from escalation.models import LogPermission
 from django.contrib.auth.models import Group
 from .registerForm import RegisterForm
 def register(request):
+
     form = RegisterForm()
+    groups = Group.objects.all()
     if request.method == 'POST':
         form = RegisterForm(request.POST)
-        print(form)
         if form.is_valid():
 
             # form.save()
-            # user = User.objects.get(name=)
+           
             # for group in form.cleaned_data['permissions']:
             #     LogPermission.objects.create(user=user, group=group)
             return redirect('initial_page')
-        """
-
-        Relacionamento
-
-        Instanciar a tebala logpermission com o id das permissoes juntamente com o novo id user e setar o is_active como null(não nessesariamente é aqui que se faz isso, ver melhor depois)
-        
-        Instaciar a tabela usergroupdefault com o id do grupo e o id do user para criar esse relacionamento False
-        is_active -
-
-            False: não pediu permissão
-
-            null: Permissão pendente
-
-            True: Permitido
-
-        |
-
-        |
-
-        V verificar se está certo a maneira de salvar o nome.
-
-        """    
-    return render(request, 'users/register.html', {'form': form})
+        return render(request, 'users/register.html', {'form': form, 'error': form.errors, 'groups': groups})
+    return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
 def login(request):
     if request.method == 'POST':
