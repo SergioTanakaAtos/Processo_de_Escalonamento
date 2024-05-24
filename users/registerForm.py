@@ -22,12 +22,8 @@ class RegisterForm(UserCreationForm):
         }
     def clean(self):
         cleaned_data = super().clean()
-        senha = cleaned_data.get('password1')
-        confirmar_senha = cleaned_data.get('password2')
         email = cleaned_data.get('email')
 
-        if senha and confirmar_senha and senha != confirmar_senha:
-            raise forms.ValidationError("As senhas não coincidem.")
 
         if email and not email.endswith('@atos.net'):
             raise forms.ValidationError("O e-mail fornecido não é válido.")
