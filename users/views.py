@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -8,8 +9,15 @@ from django.shortcuts import render, HttpResponse
 from django.contrib.auth.models import User, Group
 from escalation.models import LogPermission
 >>>>>>> 794d11a486a6c769dfa4245ccfec4cbf7ed6363c
+=======
+from django.shortcuts import render, HttpResponse
+from django.http import JsonResponse
+from django.contrib.auth.models import User, Group
+from escalation.models import LogPermission
+>>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
 
 def index(request):
+<<<<<<< HEAD
 <<<<<<< HEAD
     return render(request, 'users/login.html')
 
@@ -48,6 +56,8 @@ def logout(request):
     logout(request)
     return redirect('')
 =======
+=======
+>>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
     return render(request, 'users/index.html')
 
 def register(request):
@@ -55,6 +65,7 @@ def register(request):
 
 def get_users(request):
     users = User.objects.all()
+<<<<<<< HEAD
 
     def get_groups(user_id):
         # Obtem os IDs dos grupos associados ao usuário
@@ -69,16 +80,38 @@ def get_users(request):
         user_data = {
             'name': user.username,
             'groups': get_groups(user.id)
+=======
+    users_for_management = []
+    for user in users:
+        user_data = {
+            'id': user.id,
+            'name': user.username,
+>>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
         }
         users_for_management.append(user_data)
     
     return render(request, 'users/management.html', {'users': users_for_management})
 
 
+<<<<<<< HEAD
+=======
+def get_user_groups(request):
+    if request.method == "GET":
+        id = int(request.GET.get('id'))
+        groups_ids = LogPermission.objects.filter(user_id=id).values_list('group_id', flat=True)
+        groups = Group.objects.filter(id__in=groups_ids)
+        data = list(groups.values('id', 'name'))
+        return JsonResponse({'groups': data})
+
+>>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
 
 def cadastro_exemplo(request):
     user = User.objects.create_user("teste", "lennon@thebeatles.com", "johnpassword")
     user.set_username = "Lennon"
     user.save()
+<<<<<<< HEAD
     return HttpResponse("Usuário salvo com sucesso!")
 >>>>>>> 794d11a486a6c769dfa4245ccfec4cbf7ed6363c
+=======
+    return HttpResponse("Usuário salvo com sucesso!")
+>>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
