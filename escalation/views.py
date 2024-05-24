@@ -16,11 +16,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
-<<<<<<< HEAD
 # Create your views here.
-=======
-
->>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
 def initial_page(request):
     #pylint: disable=E1101
     groups = Group.objects.all()
@@ -66,7 +62,6 @@ def edit_group(request):
         return JsonResponse({'message':'Grupo criado com sucesso.'}, status=200)
     
     return render(request, 'initial_page.html')     
-<<<<<<< HEAD
 @csrf_exempt
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def load_data(request):
@@ -104,39 +99,6 @@ def load_data(request):
         
         return JsonResponse({'message':'Grupos e escalations criados com sucesso.'}, status=200)
     
-=======
-
-@csrf_exempt
-@user_passes_test(lambda u: u.is_superuser or u.is_staff)
-def load_data(request):
-    if request.method == 'POST' and request.FILES['xlsx_file']:
-        xlsx_file = request.FILES['xlsx_file']
-        
-        upload_dir = os.path.join(settings.BASE_DIR, 'escalation/data')
-                
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        fs = FileSystemStorage(location=upload_dir)
-        filename = fs.save(xlsx_file.name, xlsx_file)
-        
-        file_path = fs.path(filename)
-        df = pd.read_excel(file_path,engine='openpyxl')
-        for index, row in df.iterrows():
-            group_name = row['Empresa'].replace(' ', '')
-            group, created = Group.objects.get_or_create(name=group_name)
-            name = row['Nome'].replace(' ', '')
-            position = row['Cargo']
-            phone = row['Telefone'] if not pd.isnull(row['Telefone']) else ''
-            email = row['Email']
-            level = row['Nível']
-            area = row['Área']
-            service = row['Serviço']
-            #pylint: disable=E1101
-            if not Escalation.objects.filter(name=name, group=group).exists():
-                escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
-                escalation.save()
-        return redirect('initial_page')    
->>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
@@ -149,6 +111,7 @@ def escalation(request, group_id, user_id):
     
 
     escalation = Escalation.objects.filter(group=group)
+    
     if not escalation:
         return render(request, 'escalation/escalation_page.html', {'group': group, 'message': "Não há escalonamento cadastrado para este grupo."})
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
@@ -176,5 +139,3 @@ def create_escalation(request, group_id):
         
             return render(request, 'escalation/create_escalation.html', {'group': group})
     return render(request, 'escalation/create_escalation.html', {'group': group})
-
-

@@ -13,6 +13,7 @@ def permissions(request):
         
     else:    
         permissions = LogPermission.objects.filter(user=get_user(request))
+        
     return render(request, 'permission.html', {'permissions': permissions, 'admin': is_superuser})
 
 

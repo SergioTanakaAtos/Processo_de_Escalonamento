@@ -1,13 +1,8 @@
 {% extends 'base.html' %}
-<<<<<<< HEAD
-=======
-{% block title %}Escalonamento{% endblock title %}
->>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
 {% block content %}
   <div class="container">
     <h2>Escalonamento > {{ group.name }}</h2>
 
-<<<<<<< HEAD
 <<<<<<< HEAD
 <div class="d-flex mb-3">
     <a
@@ -21,11 +16,6 @@
       <a href="{% url 'create_escalation' group_id=group.id %} " class="btn btn-primary">Adicionar Escalonamento</a>
     </div>
 >>>>>>> 794d11a486a6c769dfa4245ccfec4cbf7ed6363c
-=======
-    <div class="d-flex mb-3">
-      <a href="{% url 'create_escalation' group_id=group.id %} " class="btn btn-primary">Adicionar Escalonamento</a>
-    </div>
->>>>>>> df6083bf91c7866ff210afcd4222c495bfbb7d43
 
     <table id="escalationTable" class="table table-striped">
 
