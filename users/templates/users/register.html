@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<style>
+    * {
+        margin: 0;
+        border: 0;
+    }
+
+    .btn {
+        background-color: #073958;
+        border: none;
+        margin-top: 5px;
+        padding-bottom: 7px;
+        text-align: center;
+        align-items: center;
+        line-height: 20px;
+    }
+
+    .btn {
+        text-decoration: none;
+        color: #073958;
+        color: white;
+    }
+
+    button {
+        display: flex;
+        text-align: center;
+        align-items: center;
+    }
+
+    .btn:hover {
+        background-color: #022c46;
+        color: white;
+    }
+
+    .container {
+        padding-top: 2px;
+    }
+
+    .form-group {
+        height: 8vh;
+        font-size: 15px;
+    }
+
+    h2 {
+        color: #073958;
+    }
+
+    .logoAtosDeveloped {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        margin-bottom: 10px;
+        margin-right: 25px;
+        width: 80px;
+    }
+
+    .entrarCadastro {
+        background-color: white;
+    }
+
+    .entrarCadastro:hover {
+        color: white;
+        background-color: #022c46;
+    }
+
+    label {
+        color: #073958;
+        top: 5px;
+        position: relative;
+    }
+
+    .form-control {
+        display: inline-block;
+        position: relative;
+    }
+
+    .form-control>input {
+        padding: 10px 5px;
+    }
+
+    .senha {
+        top: 60.5%;
+        position: absolute;
+        right: 7%;
+        width: 24px;
+        display: none;
+        cursor: pointer;
+    }
+
+    .btn1 {
+        border-radius: 5px;
+        transition: ease-in-out 0.3s;
+    }
+
+    .btn1>a{
+        text-decoration: none; 
+        color: #073958;
+    }
+
+    .btn1:hover {
+        background-color: white;
+        color: white;
+    }
+
+    .entreNegrito>a{
+        color: #073958;
+        text-decoration: none;
+    }
+</style>
+<div class="mt-1 container">
+    <div class="geral row justify-content-center">
+        <div class="col-md-4">
+            <h2 class="mt-0 text-center titulo">Cadastro</h2>
+            <form id="cadastroForm" method="post" action="{% url 'register' %}">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    <label for="nome" class="d-block">Nome:</label>
+                    <input type="text" class="form-control" id="nome" name="nome">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="usuario" class="d-block">Usuário:</label>
+                    <input type="text" class="form-control" id="usuario" name="usuario">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="email" class="d-block">E-mail:</label>
+                    <input type="email" class="form-control" id="email" name="email">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="senha" class="d-block" id="senhaLabel">Senha:</label>
+                    <input type="password" class="form-control" id="senha" name="senha">
+                </div>
+                <div class="form-group mb-3">
+                    <label for="confirmarSenha" class="d-block" id="senhaLabel">Confirmar senha:</label>
+                    <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha">
+                </div>
+                <div class="permission">
+                    <label class="multiple">Permissão:</label><br>
+                    <select multiple name="native-select" data-search="false" data-silent-initial-value-set="true" name="permissao">
+                        <option value="allianz">Allianz</option>
+                        <option value="hdmi">HDMI</option>
+                        <option value="b3">B3</option>
+                        <option value="toyota">Toyota</option>
+
+                    </select>
+                </div>
+                <button type="submit" class="mt-3 w-100 btn btn-primary" onclick="cadastrar()">Cadastrar</button>
+            </form>
+            <div class="text-center fraseEntrar mt-1">
+                <p>Já possui uma conta? <span class="entreNegrito"
+                        style="font-weight: bold; cursor: pointer; color: #073958"><a href={% url "login" %}>Entre!</a></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="logoAtosDeveloped text-center mt-5">
+    <img src="{% static 'assets/image (1).png' %}">
+</div>
+
+<script src="{%static 'js/virtual-select.min.js' %}"></script>
+<script type="text/javascript">
+    VirtualSelect.init({
+        ele: 'select'
+    });</script>
+{% endblock content %}
+
+{% block link_style %}
+<link rel="stylesheet" href="{% static 'css/virtual-select.min.css' %}">
+{% endblock link_style %}
