@@ -11,6 +11,11 @@ from django.contrib.auth.decorators import user_passes_test
 
 from django.http import HttpResponseForbidden
 from django.http import JsonResponse    
+import os
+from django.conf import settings
+from django.http import JsonResponse
+from django.core.files.storage import FileSystemStorage
+import pandas as pd
 # Create your views here.
 def initial_page(request):
     #pylint: disable=E1101
@@ -57,6 +62,43 @@ def edit_group(request):
         return JsonResponse({'message':'Grupo criado com sucesso.'}, status=200)
     
     return render(request, 'initial_page.html')     
+@csrf_exempt
+@user_passes_test(lambda u: u.is_superuser or u.is_staff)
+def load_data(request):
+    if request.method == 'POST' and request.FILES['csv_file']:
+        csv_file = request.FILES['csv_file']
+        
+        upload_dir = os.path.join(settings.BASE_DIR, 'escalation/static/data')
+                
+        os.makedirs(upload_dir, exist_ok=True)
+        
+        # Save the file
+        fs = FileSystemStorage(location=upload_dir)
+        filename = fs.save(csv_file.name, csv_file)
+        
+        file_path = fs.path(filename)
+        df = pd.read_csv(file_path)
+        df_group = df['group']
+        if Group.objects.filter(name__in=df_group).exists():
+            return JsonResponse({'message':'O nome do grupo já existe.'}, status=400)
+        for index, row in df.iterrows():
+            group_name = row['group']
+            group = Group.objects.get(name=group_name)
+
+            name = row['nome']
+            position = row['position']
+            phone = row['phone']
+            email = row['email']
+            level = row['level']
+            area = row['area']
+            service = row['service']
+            if Escalation.objects.filter(group=group, name=name).exists():
+                return JsonResponse({'message':'Já existe um escalonamento com este nome.'}, status=400)
+            escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
+            escalation.save()
+        
+        return JsonResponse({'message':'Grupos e escalations criados com sucesso.'}, status=200)
+    
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
@@ -74,6 +116,8 @@ def escalation(request, group_id, user_id):
         return render(request, 'escalation/escalation_page.html', {'group': group, 'message': "Não há escalonamento cadastrado para este grupo."})
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
 
+
+
 def create_escalation(request, group_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
@@ -81,7 +125,7 @@ def create_escalation(request, group_id):
     if request.method == 'POST':
         name = request.POST.get('name')
         if Escalation.objects.filter(group=group, name=name).exists():
-            return redirect('escalation/create_escalation.html', {'group': group, 'message': 'Já existe um escalonamento com este nome.'})
+            return render(request,'escalation/create_escalation.html', {'group': group, 'message': 'Já existe um escalonamento com este nome.'})
         else:
             position = request.POST.get('position')
             phone = request.POST.get('phone')

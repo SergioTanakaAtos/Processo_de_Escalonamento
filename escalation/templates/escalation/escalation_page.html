@@ -1,9 +1,9 @@
-{% extends "base.html" %} 
+{% extends 'base.html' %}
 {% block content %}
-
-<div class="container">
+  <div class="container">
     <h2>Escalonamento > {{ group.name }}</h2>
 
+<<<<<<< HEAD
 <div class="d-flex mb-3">
     <a
         href="% url 'create_escalation' group_id=group.id % "
@@ -11,29 +11,46 @@
         >Adicionar Escalonamento</a
     >
 </div>
+=======
+    <div class="d-flex mb-3">
+      <a href="{% url 'create_escalation' group_id=group.id %} " class="btn btn-primary">Adicionar Escalonamento</a>
+    </div>
+>>>>>>> 794d11a486a6c769dfa4245ccfec4cbf7ed6363c
 
     <table id="escalationTable" class="table table-striped">
-        <thead>
+
+      {% if message %}
+      <tr>
+        <td colspan="2">{{ message }}</td>
+      </tr>
+    {% else %}
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Cargo</th>
+          <th>Área</th>
+          <th>Email</th>
+          <th>Telefone</th>
+          <th>Nível</th>
+          <th>Serviço</th>
+        </tr>
+      </thead>
+      <tbody>
+          {% for item in escalation %}
             <tr>
-                <th>Nome</th>
-                <th>Telefone</th>
+              <td>{{ item.name }}</td>
+              <td>{{ item.position }}</td>
+              <td>{{ item.area }}</td>
+              <td>{{ item.email }}</td>
+              <td>{{ item.phone }}</td>
+              <td>{{ item.level }}</td>
+              <td>{{ item.service }}</td>
+              <td><button type="button" class="btn btn-primary">Editar</button></td>
             </tr>
-        </thead>
-        <tbody>
-            {% if message %} 
-                <tr>
-                    <td colspan="2">{{ message }}</td>
-                </tr>
-            {% else %}
-                {% for item in escalation %}
-                    <tr>
-                        <td>A</td>
-                        <td>B</td>
-                    </tr>
-                {% endfor %}
-            {% endif %}
-        </tbody>
+          {% endfor %}
+      </tbody>
+      {% endif %}
     </table>
-</div>
+  </div>
 
 {% endblock %}

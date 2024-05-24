@@ -5,8 +5,6 @@ from escalation.models import Group
 from django.contrib.auth import get_user 
 
 
-
-
 def permissions(request):
     is_superuser = get_user(request).is_superuser
     
