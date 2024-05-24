@@ -3,7 +3,8 @@ Django==5.0.3
 django-rest-framework==0.1.0
 djangorestframework==3.15.1
 sqlparse==0.4.4
-tzdata==2024.1asgiref==3.8.1
+tzdata==2024.1
+asgiref==3.8.1
 astroid==3.1.0
 colorama==0.4.6
 dill==0.3.8

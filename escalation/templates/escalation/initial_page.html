@@ -44,7 +44,7 @@
 <div class="container">
   <h1>Tabela de Dados</h1>
   <div class="d-flex mb-3"> 
-    <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;">    
+    <input type="text" id="searchInput" class="form-control w-25" placeholder="Pesquisar..." >    
     <button id="addButton" class="btn btn-primary">Adicionar</button>
     {% if message %}
     <div class="alert ml-3" role="alert">{{ message }}</div>
@@ -53,7 +53,7 @@
   <div class="container mt-5">
     <form id="upload-form" action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <div class="form-group">
+        <div class="form-group w-25">
             <label class="custom-file-upload">
                 <span class="file-icon">📄</span>
                 <span class="file-label">Upload de arquivo</span>
@@ -120,14 +120,13 @@
   </div>
 </div>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
+ 
 <script>
   $(document).ready(function () {
     document.getElementById("addButton").addEventListener("click", function() {
       $('#myModal').modal('show');
     });
-
+ 
     document.getElementById("saveGroup").addEventListener("click", function() {
       var newGroupName = document.getElementById("newGroupName").value;
       $.ajax({
@@ -141,11 +140,11 @@
           window.location.reload();
         },
         error: function(xhr, errmsg, err) {
-          console.log(xhr.status + ": " + xhr.responseText); 
+          console.log(xhr.status + ": " + xhr.responseText);
         }
       });
     });
-
+ 
     $("#searchInput").on("keyup", function() {
       var value = $(this).val().toLowerCase();
       $("#dataTable tbody tr").each(function() {
@@ -157,24 +156,24 @@
         }
       });
     });
-
+ 
     $(".edit-button").click(function () {
         var groupId = $(this).data("group-id");
         var row = $("#group_row_" + groupId);
-
+ 
         row.find(".edit-button").hide();
         row.find(".confirm-button, .cancel-button").show();
-
+ 
         var companyName = row.find(".editable");
         companyName.attr("contenteditable", "true");
         companyName.focus();
     });
-
+ 
     $(".confirm-button").click(function () {
         var groupId = $(this).closest("tr").attr("id").split("_")[2];
         var row = $("#group_row_" + groupId);
         var newCompany = row.find(".editable").text();
-
+ 
         $.ajax({
             url: "{% url 'edit_group' %}",
             type: "POST",
@@ -185,30 +184,30 @@
             },
             success: function (response) {
                 row.find(".editable").text(newCompany);
-                row.find(".edit-controls").show(); 
+                row.find(".edit-controls").show();
                 row.find(".edit-field").hide();
                 window.location.reload();
             },
             error: function (xhr, status, error) {
                 console.error(error);
                 row.find(".editable").attr("contenteditable", "false");
-                row.find(".edit-controls").show(); 
+                row.find(".edit-controls").show();
                 row.find(".edit-field").hide();
             },
         });
     });
-
+ 
     $(".cancel-button").click(function () {
         var groupId = $(this).closest("tr").attr("id").split("_")[2];
         var row = $("#group_row_" + groupId);
-
+ 
         row.find(".editable").attr("contenteditable", "false");
         row.find(".edit-controls").show();
         row.find(".edit-field").hide();
         window.location.reload();
     });
   });
-
+ 
   document.getElementById('file-input').addEventListener('change', function() {
     document.getElementById('upload-form').submit();
 });
