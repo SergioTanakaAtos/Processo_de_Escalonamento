@@ -27,10 +27,11 @@ def initial_page(request):
     for group in groups:
         log_per, created = LogPermission.objects.get_or_create(group=group, user=user)
         user_group = UserGroupDefault.objects.filter(group=group, user=user).first()
-        if user_group.is_visualizer:
-            log_per.is_active = True
-        if created:
-            log_per.save()
+        if user_group is not None:
+            if user_group.is_visualizer:
+                log_per.is_active = True
+            if created:
+                log_per.save()
 
         group_states[group] = states_mapping.get(log_per.is_active, "Não pediu permissão")
     return render(request, 'escalation/initial_page.html', {'group_states': group_states})

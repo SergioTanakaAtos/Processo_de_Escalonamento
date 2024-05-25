@@ -115,9 +115,10 @@
             <h2 class="text-center mb-4">Cadastro</h2>
             <form id="cadastroForm" method="post" action="{% url 'register' %}">
                 {% csrf_token %}
+   
                 <div class="mb-3">
-                    <label for="{{ form.first_name.id }}" class="form-label">{{ form.first_name.label }}:</label>
-                    {{ form.first_name }}
+                    <label for="{{ form.username.id }}" class="form-label">{{ form.username.label }}:</label>
+                    {{ form.username }}
                 </div>
                 <div class="mb-3">
                     <label for="{{ form.email.id }}" class="form-label">{{ form.email.label }}:</label>

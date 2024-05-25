@@ -5,9 +5,9 @@ from django.contrib.auth.models import User, Group
 class RegisterForm(UserCreationForm):
     class Meta:
         model = User
-        fields = ['first_name', 'email', 'password1', 'password2']
+        fields = ['username', 'email', 'password1', 'password2']
         labels = {
-            'first_name': 'Nome',
+            'username': 'Usuário',
             'email': 'E-mail',
             'password1': 'Senha',
             'password2': 'Confirmar senha',
@@ -23,7 +23,11 @@ class RegisterForm(UserCreationForm):
 
         if email and not email.endswith('@atos.net'):
             raise forms.ValidationError("O e-mail fornecido não é válido.")
-        
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError("Este e-mail já está em uso.")
+        return email
     def clean_permissions(self):
         permissions = self.cleaned_data.get('permissions')
         if not permissions:

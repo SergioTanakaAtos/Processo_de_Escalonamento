@@ -12,23 +12,26 @@ def register(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-
-            # form.save()
-           
-            # for group in form.cleaned_data['permissions']:
-            #     LogPermission.objects.create(user=user, group=group)
-            return redirect('initial_page')
+            permission_groups = request.POST.getlist('permissions')[0].split(',')
+            user = form.save()
+            for group_id in permission_groups:
+                group = Group.objects.get(id=group_id)
+                LogPermission.objects.create(user=user, group=group,is_active=None)
+            return redirect('login')
         return render(request, 'users/register.html', {'form': form, 'error': form.errors, 'groups': groups})
     return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
-def login(request):
+def login_view(request):
     if request.method == 'POST':
-        email = request.POST["email"]
+        # email = request.POST["email"]
+        username = request.POST["username"]
         password = request.POST["senha"]
-        user = authenticate(request, email=email, password=password)
-        print(f"user = {user}, email = {email}, senha = {password}")
+        user = authenticate(request, username=username, password=password)
+        # user = User.objects.filter(email=email,password=password).first()
+        
+            
         if user is not None:
-           # login(request, user)
+            login(request, user)
             return redirect('initial_page')
         return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
     return render(request, 'users/login.html')
