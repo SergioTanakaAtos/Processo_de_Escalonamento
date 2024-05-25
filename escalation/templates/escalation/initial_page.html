@@ -44,22 +44,26 @@
   <h1>Tabela de Dados</h1>
   <div class="d-flex mb-3"> 
     <input type="text" id="searchInput" class="form-control w-25" placeholder="Pesquisar..." >    
-    <button id="addButton" class="btn btn-primary">Adicionar</button>
+    {% if user.is_superuser or user.is_staff %}
+      <button id="addButton" class="btn btn-primary">Adicionar</button>
+    {% endif %}
     {% if message %}
     <div class="alert ml-3" role="alert">{{ message }}</div>
     {% endif %}
   </div>
   <div class="container mt-5">
-    <form id="upload-form" action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <div class="form-group w-25">
-            <label class="custom-file-upload">
-                <span class="file-icon">📄</span>
-                <span class="file-label">Upload de arquivo</span>
-                <input id="file-input" type="file" name="xlsx_file" accept=".xlsx" required>
-            </label>
-        </div>
-    </form>
+    {% if user.is_superuser or user.is_staff %}
+      <form id="upload-form" action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <div class="form-group w-25">
+              <label class="custom-file-upload">
+                  <span class="file-icon">📄</span>
+                  <span class="file-label">Upload de arquivo</span>
+                  <input id="file-input" type="file" name="xlsx_file" accept=".xlsx" required>
+              </label>
+          </div>
+      </form>
+    {% endif %}
 </div>
 
   <table id="dataTable" class="table table-striped">
@@ -83,11 +87,13 @@
       </td>
 </td>        <td><a href="{% url 'create-permission' group_id=group.id%}">Solicitar</a></td>
         <td>
+          {% if user.is_superuser or user.is_staff%}
             <div class="edit-controls">
                 <button class="btn btn-primary edit-button" data-group-id="{{ group.id }}">Editar</button>
                 <button class="btn btn-success confirm-button" style="display: none;">Confirmar</button>
                 <button class="btn btn-danger cancel-button" style="display: none;">Cancelar</button>
             </div>
+          {% endif %}
             <div class="edit-field" style="display: none;">
                 <input type="text" class="form-control edited-company" value="{{ group }}" data-original-value="{{ group }}" />
             </div>
