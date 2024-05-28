@@ -41,18 +41,21 @@
                         </div>
                         
                     
-                    {% else  %}
+                    {% elif p.is_active != False  %}
 
                         <div class="desc-permission">
                             <p>
-                                <b>Solicitação de acesso para: <br>
-                                {{ p.group}}
+                                <b>Solicitação de acesso para: </b><br>
+                                {{ p.group }}
                             </p>
                         </div>    
 
-                        <div class="buttons-permissions">
-                            <a class="btn btn-primary" href="{% url '' %}" role="button">Confirmar</a>
-                            <a class="btn btn-primary" href="#" role="button">Recusar</a>
+                        <div class="permissions-status">
+                            {% if p.is_active %}
+                                <p style="background-color: #69AD8D; padding: 5px; border-radius: 10px; ">Permitido</p>
+                            {% else %}  
+                                <p style="background-color: #C7BF7F; padding: 5px; border-radius: 10px;">Pendente</p>
+                            {% endif %}
                         </div>
 
                     {% endif %}

@@ -94,6 +94,7 @@ def load_data(request):
                 escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
                 escalation.save()
         return redirect('initial_page')    
+    
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)

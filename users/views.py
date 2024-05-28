@@ -59,7 +59,7 @@ def get_user_groups(request):
         try:
             id = int(request.GET.get('id'))
             user = User.objects.get(id=id)
-            groups_ids = LogPermission.objects.filter(user_id=id).values_list('group_id', flat=True)
+            groups_ids = LogPermission.objects.filter(user_id=id, is_active = True).values_list('group_id', flat=True)
             groups = Group.objects.filter(id__in=groups_ids)
             data = list(groups.values('id', 'name'))
 
