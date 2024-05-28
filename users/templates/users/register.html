@@ -94,7 +94,7 @@
         transition: ease-in-out 0.3s;
     }
  
-    .btn1>a{
+    .btn1>a {
         text-decoration: none;
         color: #073958;
     }
@@ -104,65 +104,66 @@
         color: white;
     }
  
-    .entreNegrito>a{
+    .entreNegrito>a {
         color: #073958;
         text-decoration: none;
     }
 </style>
-<div class="mt-1 container">
-    <div class="geral row justify-content-center">
-        <div class="col-md-4">
-            <h2 class="mt-0 text-center titulo">Cadastro</h2>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Cadastro</h2>
             <form id="cadastroForm" method="post" action="{% url 'register' %}">
                 {% csrf_token %}
-                <div class="form-group mb-3">
-                    <label for="nome" class="d-block">Nome:</label>
-                    <input type="text" class="form-control" id="nome" name="nome">
+   
+                <div class="mb-3">
+                    <label for="{{ form.username.id }}" class="form-label">{{ form.username.label }}:</label>
+                    {{ form.username }}
                 </div>
-                <div class="form-group mb-3">
-                    <label for="usuario" class="d-block">Usuário:</label>
-                    <input type="text" class="form-control" id="usuario" name="usuario">
+                <div class="mb-3">
+                    <label for="{{ form.email.id }}" class="form-label">{{ form.email.label }}:</label>
+                    {{ form.email }}
                 </div>
-                <div class="form-group mb-3">
-                    <label for="email" class="d-block">E-mail:</label>
-                    <input type="email" class="form-control" id="email" name="email">
+                <div class="mb-3">
+                    <label for="{{ form.password1.id }}" class="form-label">{{ form.password1.label }}:</label>
+                    {{ form.password1 }}
                 </div>
-                <div class="form-group mb-3">
-                    <label for="senha" class="d-block" id="senhaLabel">Senha:</label>
-                    <input type="password" class="form-control" id="senha" name="senha">
+                <div class="mb-3">
+                    <label for="{{ form.password2.id }}" class="form-label">{{ form.password2.label }}:</label>
+                    {{ form.password2 }}
                 </div>
-                <div class="form-group mb-3">
-                    <label for="confirmarSenha" class="d-block" id="senhaLabel">Confirmar senha:</label>
-                    <input type="password" class="form-control" id="confirmarSenha" name="confirmarSenha">
-                </div>
-                <div class="permission">
-                    <label class="multiple">Permissão:</label><br>
-                    <select multiple name="native-select" data-search="false" data-silent-initial-value-set="true" name="permissao">
-                        <option value="allianz">Allianz</option>
-                        <option value="hdmi">HDMI</option>
-                        <option value="b3">B3</option>
-                        <option value="toyota">Toyota</option>
- 
+                <div class="mb-3">
+                    <label for="permissions" class="form-label">Permissões:</label>
+                    <select multiple class="form-select" name="permissions" id="permissions">
+                        {% for group in groups %}
+                            <option value="{{ group.id }}">{{ group.name }}</option>
+                        {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="mt-3 w-100 btn btn-primary" onclick="cadastrar()">Cadastrar</button>
+                <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
             </form>
-            <div class="text-center fraseEntrar mt-1">
-                <p>Já possui uma conta? <span class="entreNegrito"
-                        style="font-weight: bold; cursor: pointer; color: #073958"><a href={% url "login" %}>Entre!</a></span></p>
+            {% if error %}
+                <div class="alert alert-danger mt-3" role="alert">
+                    {{ error }}
+                </div>
+            {% endif %}
+            <div class="text-center mt-3">
+                <p>Já possui uma conta? <a href="{% url 'login' %}">Entre!</a></p>
             </div>
         </div>
     </div>
 </div>
-<div class="logoAtosDeveloped text-center mt-5">
-    <img src="{% static 'assets/image (1).png' %}">
+
+<div class="text-center mt-5">
+    <img src="{% static 'assets/image (1).png' %}" class="logoAtosDeveloped">
 </div>
- 
-<script src="{%static 'js/virtual-select.min.js' %}"></script>
+
+<script src="{% static 'js/virtual-select.min.js' %}"></script>
 <script type="text/javascript">
     VirtualSelect.init({
         ele: 'select'
-    });</script>
+    });
+</script>
 {% endblock content %}
  
 {% block link_style %}

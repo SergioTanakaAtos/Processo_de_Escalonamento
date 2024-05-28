@@ -5,36 +5,34 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from escalation.models import LogPermission
 from django.contrib.auth.models import Group
-
- 
+from .registerForm import RegisterForm
 def register(request):
+
+    form = RegisterForm()
+    groups = Group.objects.all()
     if request.method == 'POST':
-        nome = request.POST.get('nome')
-        usuario = request.POST.get('usuario')
-        email = request.POST.get('email')
-        senha = request.POST.get('senha')
-        permissoes = request.POST.getlist('permissao')
-        confirmar_senha = request.POST.get('confirmarSenha')
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            permission_groups = request.POST.getlist('permissions')[0].split(',')
+            user = form.save()
+            for group_id in permission_groups:
+                group = Group.objects.get(id=group_id)
+                LogPermission.objects.create(user=user, group=group,is_active=None)
+            return redirect('login')
+        return render(request, 'users/register.html', {'form': form, 'error': form.errors, 'groups': groups})
+    return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
-        if senha != confirmar_senha:
-            return render(request, 'users/register.html', {'error': 'As senhas não coincidem!'})
- 
-        if not email.endswith('@atos.net'):
-           return render(request, 'users/register.html', {'error': 'O e-mail fornecido não é válido'})
-        user = User.objects.create_user(usuario, email, senha)
-        user.save()
-        return render(request, 'users/login.html')
-    
-    return render(request, 'users/register.html')
- 
-def login(request):
+def login_view(request):
     if request.method == 'POST':
-        email = request.POST["email"]
+        # email = request.POST["email"]
+        username = request.POST["username"]
         password = request.POST["senha"]
-        user = authenticate(request, email=email, password=password)
-        print(f"user = {user}, email = {email}, senha = {password}")
+        user = authenticate(request, username=username, password=password)
+        # user = User.objects.filter(email=email,password=password).first()
+        
+            
         if user is not None:
-           # login(request, user)
+            login(request, user)
             return redirect('initial_page')
         return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
     return render(request, 'users/login.html')
