@@ -44,7 +44,6 @@
     <h1>Controle de acesso</h1>
     <div class="d-flex mb-3">
       <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;" />
-      <button id="addButton" class="btn btn-primary">Adicionar</button>
 
       {% if message %}
         <div class="alert alert-info ml-3" role="alert">{{ message }}</div>
@@ -67,16 +66,18 @@
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Detalhes</h5>
+          <h5 class="modal-title" id="staticBackdropLabel">Acessos</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body" id="modalContent" style="overflow-wrap: break-word;">
+          <h5 id="title"></h5>
           <ul class="list-group" id="groups"></ul>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Salvar</button>
         </div>
       </div>
     </div>
@@ -86,26 +87,35 @@
   {% block script %}
   <script>
     $(document).ready(function() {
+      // Limpar a lista de grupos quando o modal for fechado
       $('#staticBackdrop').on('hidden.bs.modal', function() {
         $('#groups').empty();
       });
-
+  
       $('.btn-fechar').on('click', async function() {
         var userId = $(this).closest('.card-users').data('id');
         
         try {
           const response = await fetch(`/get_groups/?id=${userId}`);
           const data = await response.json();
-        
+          
+          var groups = document.getElementById('groups')
+          var title = document.getElementById('title')
+
+          groups.innerHTML = ''
+          title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`
+
           if (data.groups && data.groups.length > 0) {
             data.groups.forEach(group => {
               $('#groups').append(`
                 <li class="list-group-item">
-                  <input class="form-check-input me-1" type="checkbox" value="" id="groupCheckbox${group.id}">
+                  <input class="form-check-input me-1" type="checkbox" value="" id="groupCheckbox${group.id}" checked>
                   <label class="form-check-label" for="groupCheckbox${group.id}">${group.name}</label>
                 </li>`
               );
             });
+
+
           } else {
             $('#groups').append('<li class="list-group-item">Nenhum grupo encontrado.</li>');
           }
