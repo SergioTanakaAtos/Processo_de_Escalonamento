@@ -36,6 +36,8 @@
  
     .container {
         padding-top: 2px;
+        flex-direction: column;
+        display: flex;
     }
  
     .form-group {
@@ -71,12 +73,12 @@
         position: relative;
     }
  
-    .form-control {
+    .form-label {
         display: inline-block;
         position: relative;
     }
  
-    .form-control>input {
+    .form-label {
         padding: 10px 5px;
     }
  
@@ -108,31 +110,37 @@
         color: #073958;
         text-decoration: none;
     }
+
+    .labels{
+        flex-direction: column;
+        display: flex;
+        border: solid 1px solid;
+    }
 </style>
-<div class="container mt-4">
+<div class="container mt-2">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <h2 class="text-center mb-4">Cadastro</h2>
+            <h2 class="text-center mb-1">Cadastro</h2>
             <form id="cadastroForm" method="post" action="{% url 'register' %}">
                 {% csrf_token %}
    
-                <div class="mb-3">
-                    <label for="{{ form.username.id }}" class="form-label d-block">{{ form.username.label }}:</label>
+                <div class="mb-1 labels">
+                    <label for="{{ form.username.id }}" class="form-label">{{ form.username.label }}:</label>
                     {{ form.username }}
                 </div>
-                <div class="mb-3">
-                    <label for="{{ form.email.id }}" class="form-label d-block">{{ form.email.label }}:</label>
+                <div class="mb-1 labels">
+                    <label for="{{ form.email.id }}" class="form-label">{{ form.email.label }}:</label>
                     {{ form.email }}
                 </div>
-                <div class="mb-3">
-                    <label for="{{ form.password1.id }}" class="form-label d-block">{{ form.password1.label }}:</label>
+                <div class="mb-1 labels">
+                    <label for="{{ form.password1.id }}" class="form-label">{{ form.password1.label }}:</label>
                     {{ form.password1 }}
                 </div>
-                <div class="mb-3">
-                    <label for="{{ form.password2.id }}" class="form-label d-block">{{ form.password2.label }}:</label>
+                <div class="mb-1 labels">
+                    <label for="{{ form.password2.id }}" class="form-label">{{ form.password2.label }}:</label>
                     {{ form.password2 }}
                 </div>
-                <div class="mb-3">
+                <div class="mb-1 labels">
                     <label for="permissions" class="form-label">Permissões:</label>
                     <select multiple class="form-select" name="permissions" id="permissions">
                         {% for group in groups %}
@@ -140,14 +148,14 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block ">Cadastrar</button>
+                <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
             </form>
             {% if error %}
                 <div class="alert alert-danger mt-3" role="alert">
                     {{ error }}
                 </div>
             {% endif %}
-            <div class="text-center mt-3">
+            <div class="text-center mt-2">
                 <p>Já possui uma conta? <a href="{% url 'login' %}">Entre!</a></p>
             </div>
         </div>
