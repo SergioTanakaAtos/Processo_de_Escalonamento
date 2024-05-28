@@ -14,7 +14,7 @@
       align-items: center;
       transition: height 0.3s;
     }
-   
+    
     .container-user {
       display: flex;
       flex-direction: row;
@@ -22,7 +22,7 @@
       justify-content: space-between;
       gap: 30px;
     }
-   
+    
     .btn-fechar {
       margin-top: 20px;
       background-color: #073958;
@@ -32,94 +32,102 @@
       cursor: pointer;
       border-radius: 5px;
     }
-   
+    
     .btn-fechar:hover {
       background-color: #055070;
     }
   </style>
 {% endblock %}
- 
+
 {% block content %}
   <div class="container">
     <h1>Controle de acesso</h1>
     <div class="d-flex mb-3">
       <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;" />
-      <button id="addButton" class="btn btn-primary">Adicionar</button>
- 
+
       {% if message %}
-        <div class="alert ml-3" role="alert">{{ message }}</div>
+        <div class="alert alert-info ml-3" role="alert">{{ message }}</div>
       {% endif %}
     </div>
- 
+
     <div class="container-user" id="cardUser">
       {% for user in users %}
         <div class="card-users collapsed" data-id="{{ user.id }}">
-            <i class="bi bi-person-fill" style="font-size: 40px; color: #073958;"></i>
+          <i class="bi bi-person-fill" style="font-size: 40px; color: #073958;"></i>
           <h4>{{ user.name }}</h4>
-          <button class="btn-fechar" data-toggle="modal" data-target="#staticBackdrop" onclick="titleModal({{user.name}})">Ver acessos</button>
+          <button class="btn-fechar" data-toggle="modal" data-target="#staticBackdrop">Ver acessos</button>
         </div>
       {% endfor %}
     </div>
   </div>
- 
- 
+  
   <!-- Modal -->
   <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog  modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Detalhes</h5>
+          <h5 class="modal-title" id="staticBackdropLabel">Acessos</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body" id="modalContent" style="overflow-wrap: break-word;">
+          <h5 id="title"></h5>
           <ul class="list-group" id="groups"></ul>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal">Salvar</button>
         </div>
       </div>
     </div>
   </div>
   <!-- Modal end -->
- 
+
+  {% block script %}
   <script>
     $(document).ready(function() {
+      // Limpar a lista de grupos quando o modal for fechado
       $('#staticBackdrop').on('hidden.bs.modal', function() {
         $('#groups').empty();
       });
- 
+  
       $('.btn-fechar').on('click', async function() {
         var userId = $(this).closest('.card-users').data('id');
-        var groupName = "Teste"
- 
+        
         try {
           const response = await fetch(`/get_groups/?id=${userId}`);
           const data = await response.json();
-          console.log(data)
+          
+          var groups = document.getElementById('groups')
+          var title = document.getElementById('title')
+
+          groups.innerHTML = ''
+          title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`
+
           if (data.groups && data.groups.length > 0) {
             data.groups.forEach(group => {
               $('#groups').append(`
                 <li class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="" id="firstCheckbox">
-                    <label class="form-check-label" for="firstCheckbox">${group.name}</label>
+                  <input class="form-check-input me-1" type="checkbox" value="" id="groupCheckbox${group.id}" checked>
+                  <label class="form-check-label" for="groupCheckbox${group.id}">${group.name}</label>
                 </li>`
-            );
+              );
             });
+
+
           } else {
             $('#groups').append('<li class="list-group-item">Nenhum grupo encontrado.</li>');
           }
-         
+          
         } catch (error) {
           console.error('Erro ao buscar dados do usuário:', error);
           $('#groups').append('<li class="list-group-item">Erro ao buscar dados.</li>');
         }
-       
+        
         $('#staticBackdrop').modal('show');
       });
     });
- 
-   
   </script>
+  {% endblock %}
 {% endblock %}

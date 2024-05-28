@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from escalation.models import LogPermission
 from django.contrib.auth.models import Group
@@ -55,8 +56,21 @@ def get_users(request):
  
 def get_user_groups(request):
     if request.method == "GET":
-        id = int(request.GET.get('id'))
-        groups_ids = LogPermission.objects.filter(user_id=id).values_list('group_id', flat=True)
-        groups = Group.objects.filter(id__in=groups_ids)
-        data = list(groups.values('id', 'name'))
-        return JsonResponse({'groups': data})
+        try:
+            id = int(request.GET.get('id'))
+            user = User.objects.get(id=id)
+            groups_ids = LogPermission.objects.filter(user_id=id).values_list('group_id', flat=True)
+            groups = Group.objects.filter(id__in=groups_ids)
+            data = list(groups.values('id', 'name'))
+
+            user_data = {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+            }
+
+            return JsonResponse({'groups': data, 'user': user_data})
+        except (ValueError, ObjectDoesNotExist):
+            return JsonResponse({'error': 'User not found or invalid id'}, status=400)
+
+
