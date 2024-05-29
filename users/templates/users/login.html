@@ -131,6 +131,11 @@
                 <p>Ainda não tem uma conta? <span class="entreNegrito"
                         style="font-weight: bold; cursor: pointer; color: #073958"><a href={% url "register" %}>Cadastre-se!</a></span></p>
             </div>
+            {% if message %}
+                <div class="alert alert-danger">
+                    {{ message }}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

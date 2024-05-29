@@ -13,12 +13,13 @@ from django.http import HttpResponseForbidden
 from django.http import JsonResponse    
 import os
 from django.conf import settings
-from django.http import JsonResponse
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
+from django.contrib import messages
 
 def initial_page(request):
     #pylint: disable=E1101
+    # message = messages.get_messages(request)
     groups = Group.objects.all()
     user = request.user
     group_states = {} 
@@ -100,10 +101,12 @@ def escalation(request, group_id, user_id):
     group = Group.objects.get(id=group_id)
     user = User.objects.get(id=user_id)
     
-    user_group_default = get_object_or_404(UserGroupDefault, user=user, group=group)
-
+    user_group_default = UserGroupDefault.objects.filter(group=group, user=user).first()
+    if user_group_default is None:
+        messages.error(request, 'Usuário não pertence a este grupo.')
+        return redirect('initial_page')
     if not user_group_default.is_visualizer:
-        return HttpResponseForbidden("Você não tem permissão para visualizar este cliente.")
+        return redirect('initial_page')
     
 
     escalation = Escalation.objects.filter(group=group)

@@ -34,13 +34,12 @@ def login_view(request):
         if user is not None:
             login(request, user)
             return redirect('initial_page')
-        return render(request, 'users/login.html', {'error': 'Usuário ou senha inválidos'})
+        return render(request, 'users/login.html', {'message': 'Usuário ou senha inválidos'})
     return render(request, 'users/login.html')
  
-def logout(request):
+def logout_view(request):
     logout(request)
-    return redirect('')
-
+    return redirect('login')
 def get_users(request):
     users = User.objects.all()
     users_for_management = []

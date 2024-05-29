@@ -21,11 +21,14 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url "management" %}">Controle de acesso</a>
                     </li>
-                {% endif %} 
+                {% endif %}
             </ul>
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="#"> {{user}}</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Sair</a>
                 </li>
             </ul>
         </div>
