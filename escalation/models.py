@@ -32,7 +32,18 @@ class UserGroupDefault(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='usergroupdefaults')
 
 class LogPermission(models.Model):
+    STATUS_CHOICES = [
+        ('activate', 'Activate'),
+        ('desactivate', 'Desactivate'),
+        ('denied', 'Denied'),
+        ('pending', 'Pending'),
+    ]
+ 
+    status = models.CharField(
+        max_length=11,
+        choices=STATUS_CHOICES,
+        default='desactivate',
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='log_permissions')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='log_permissions')
-    is_active = models.BooleanField(default=False,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
