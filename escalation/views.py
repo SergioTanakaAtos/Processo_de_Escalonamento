@@ -23,7 +23,6 @@ def initial_page(request):
     groups = Group.objects.all()
     user = request.user
     group_states = {} 
-    states_mapping = {None: "Permissão pendente", 'activate': "Permitido", False: "Não pediu permissão"}
     states_mapping = {'desactivate': "Não pediu permissão", 'pending': "Permissão pendente", 'activate': "Permitido", 'denied': "Permissão negada"}
     for group in groups:
         log_per, created = LogPermission.objects.get_or_create(group=group, user=user)
