@@ -46,10 +46,9 @@
     {% if user.is_superuser or user.is_staff %}
       <button id="addButton" class="btn btn-primary">Adicionar</button>
     {% endif %}
-    {% if message %}
-    <div class="alert ml-3" role="alert">{{ message }}</div>
-    {% endif %}
   </div>
+
+
   <div class="container mt-5">
     {% if user.is_superuser or user.is_staff %}
       <form id="upload-form" action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
@@ -63,8 +62,16 @@
           </div>
       </form>
     {% endif %}
+  </div>
+{% if messages %}
+<div class="mt-3"> 
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+    </div>
+  {% endfor %}
 </div>
-
+{% endif %}
   <table id="dataTable" class="table table-striped">
     <thead>
       <tr>
@@ -76,15 +83,21 @@
       {% for group, state in group_states.items %}
       <tr id="group_row_{{ group.id }}">
         <td class="editable" data-group-id="{{ group.id }}"><a href={%url 'escalation' group_id=group.id user_id=user.id%}>{{ group }}</a></td>
+          <td>
+            <div class="status-cell {% if state == 'Permitido' %} bg-success 
+                                    {% elif state == 'Permissão pendente' %} bg-warning 
+                                    {% elif state == 'Não pediu permissão' %} bg-danger 
+                                    {% elif state == 'Permissão negada' %} bg-danger 
+                                    {% endif %}">
+                {{ state }}
+            </div>
+          </td>
+      </td>      
+      {% if state != 'Permitido' and state != 'Permissão pendente' %}
         <td>
-          <div class="status-cell {% if state == 'Permitido' %} bg-success 
-                                  {% elif state == 'Permissão pendente' %} bg-warning 
-                                  {% elif state == 'Não pediu permissão' %} bg-danger 
-                                  {% endif %}">
-              {{ state }}
-          </div>
-      </td>
-</td>        <td><a href="{% url 'create-permission' group_id=group.id%}">Solicitar</a></td>
+          <a href="{% url 'create-permission' group_id=group.id %}">Solicitar</a>
+        </td>
+    {% endif %}
         <td>
           {% if user.is_superuser or user.is_staff%}
             <div class="edit-controls">
@@ -143,7 +156,9 @@
           window.location.reload();
         },
         error: function(xhr, errmsg, err) {
+          
           console.log(xhr.status + ": " + xhr.responseText);
+          window.location.reload();
         }
       });
     });
@@ -196,6 +211,7 @@
                 row.find(".editable").attr("contenteditable", "false");
                 row.find(".edit-controls").show();
                 row.find(".edit-field").hide();
+                window.location.reload();
             },
         });
     });

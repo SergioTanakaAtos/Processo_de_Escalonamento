@@ -8,7 +8,7 @@ from django.contrib.auth import get_user
 def permissions(request):
     is_superuser = get_user(request).is_superuser
     if is_superuser:
-        permissions = LogPermission.objects.filter(is_active=None)
+        permissions = LogPermission.objects.filter(status='pending')
         
     else:    
         permissions = LogPermission.objects.filter(user=get_user(request))
@@ -19,10 +19,10 @@ def permissions(request):
 
 def save_permission(request, group_id):
  
-    if LogPermission.objects.filter(is_active=False):
+    if LogPermission.objects.filter(status='desactivate'):
         try: 
             permission = LogPermission.objects.filter(user=get_user(request), group=group_id).get()
-            permission.is_active = None
+            permission.status = 'pending'
             permission.save()
             return redirect('permissions')
         except LogPermission.DoesNotExist:
@@ -31,7 +31,7 @@ def save_permission(request, group_id):
         
 def accepted_permission(request, permission_id):
     permission = LogPermission.objects.filter(id=permission_id).get()
-    permission.is_active = True
+    permission.status = 'activate'
     permission.save()
     return redirect('permissions')
 
@@ -39,7 +39,7 @@ def accepted_permission(request, permission_id):
     
 def denied_permission(request, permission_id):
     permission = LogPermission.objects.filter(id=permission_id).get()
-    permission.is_active = False
+    permission.status = 'denied'
     permission.save()
     return redirect('permissions')
 

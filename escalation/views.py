@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponse
 from django.http import JsonResponse    
 import os
 from django.conf import settings
@@ -30,6 +30,7 @@ def initial_page(request):
         if user_group is not None:
             if user_group.is_visualizer:
                 log_per.status = 'activate'
+                
             if created:
                 log_per.save()
 
@@ -47,20 +48,27 @@ def save_group(request):
                 return JsonResponse({'message':'O nome do grupo já existe.'}, status=400)
             group = Group(name=group_name)
             group.save()
-            return JsonResponse({'message':'Grupo criado com sucesso.'}, status=200)
+            messages.success(request, 'Grupo criado com sucesso.')
+            return HttpResponse(status=200)
         else:
-            return JsonResponse({'message':'O nome do grupo não pode estar vazio.'}, status=400)
-    return JsonResponse({'message':'Método não permitido.'}, status=405)
+            messages.error(request, 'O nome do grupo não pode ser vazio.')
+            return HttpResponse(status=400)
+    messages.error(request, 'Método não permitido.')
+    return HttpResponse(status=400)
 @csrf_exempt
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def edit_group(request):
     if request.method == 'POST':
         group_id = request.POST.get('group_id')
         new_group_name = request.POST.get('new_company')
+        if not new_group_name:
+            messages.error(request, 'O nome do grupo não pode ser vazio.')
+            return HttpResponse(status=400)
         group = Group.objects.get(id=group_id)
         group.name = new_group_name
         group.save()
-        return JsonResponse({'message':'Grupo criado com sucesso.'}, status=200)
+        messages.success(request, 'Grupo editado com sucesso.')
+        return HttpResponse(status=200)
     
     return render(request, 'initial_page.html')     
 
@@ -93,7 +101,11 @@ def load_data(request):
             if not Escalation.objects.filter(name=name, group=group).exists():
                 escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
                 escalation.save()
+
+        os.remove(file_path)
+        messages.success(request, 'Dados carregados com sucesso.')
         return redirect('initial_page')    
+    messages.error(request, 'Não foi usado arquivo XLSX.')
     
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
@@ -105,12 +117,14 @@ def escalation(request, group_id, user_id):
         messages.error(request, 'Usuário não pertence a este grupo.')
         return redirect('initial_page')
     if not user_group_default.is_visualizer:
+        messages.error(request, 'Usuário não tem permissão.')
         return redirect('initial_page')
     
 
     escalation = Escalation.objects.filter(group=group)
     if not escalation:
-        return render(request, 'escalation/escalation_page.html', {'group': group, 'message': "Não há escalonamento cadastrado para este grupo."})
+        messages.error(request, 'Não há escalonamento cadastrado para este grupo.')
+        return render(request, 'escalation/escalation_page.html', {'group': group})
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
 
 
@@ -122,7 +136,8 @@ def create_escalation(request, group_id):
     if request.method == 'POST':
         name = request.POST.get('name')
         if Escalation.objects.filter(group=group, name=name).exists():
-            return render(request,'escalation/create_escalation.html', {'group': group, 'message': 'Já existe um escalonamento com este nome.'})
+            messages.error(request, 'Já existe um escalonamento com este nome.')
+            return render(request,'escalation/create_escalation.html', {'group': group})
         else:
             position = request.POST.get('position')
             phone = request.POST.get('phone')
@@ -133,7 +148,7 @@ def create_escalation(request, group_id):
             escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
             
             escalation.save()
-        
+            messages.success(request, 'Escalonamento criado com sucesso.')
             return render(request, 'escalation/create_escalation.html', {'group': group})
     return render(request, 'escalation/create_escalation.html', {'group': group})
 
