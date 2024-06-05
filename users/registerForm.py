@@ -12,7 +12,10 @@ class RegisterForm(UserCreationForm):
             'password1': 'Senha',
             'password2': 'Confirmar senha',
         }
-
+    def __init__(self, *args, **kwargs):
+        super(RegisterForm, self).__init__(*args, **kwargs)
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
     def clean(self):
         cleaned_data = super().clean()
         email = cleaned_data.get('email')
