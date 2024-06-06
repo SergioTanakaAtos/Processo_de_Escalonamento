@@ -15,6 +15,8 @@ def register(request):
         if form.is_valid():
             permission_groups = request.POST.getlist('permissions')[0].split(',')
             user = form.save()
+            if permission_groups == ['']:
+                return redirect('login')
             for group_id in permission_groups:
                 group = Group.objects.get(id=group_id)
                 LogPermission.objects.create(user=user, group=group,status='pending')
@@ -29,8 +31,6 @@ def login_view(request):
         password = request.POST["senha"]
         user = authenticate(request, username=username, password=password)
         # user = User.objects.filter(email=email,password=password).first()
-        
-            
         if user is not None:
             login(request, user)
             return redirect('initial_page')

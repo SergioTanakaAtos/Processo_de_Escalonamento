@@ -81,22 +81,30 @@ def edit_group(request):
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def load_data(request):
-    if request.method == 'POST' and request.FILES['xlsx_file']:
+    if request.method == 'POST':
+        if 'xlsx_file' not in request.FILES:
+            messages.error(request, 'Nenhum arquivo XLSX foi enviado.')
+            return redirect('initial_page')
+
+        xlsx_file = request.FILES['xlsx_file']
+
         try:
-            xlsx_file = request.FILES['xlsx_file']
-            
+            # Diretório de upload
             upload_dir = os.path.join(settings.BASE_DIR, 'escalation/data')
-                    
             os.makedirs(upload_dir, exist_ok=True)
-            
+
+            # Salvando o arquivo enviado
             fs = FileSystemStorage(location=upload_dir)
             filename = fs.save(xlsx_file.name, xlsx_file)
-            
             file_path = fs.path(filename)
-            df = pd.read_excel(file_path,engine='openpyxl')
+
+            # Lendo o arquivo XLSX
+            df = pd.read_excel(file_path, engine='openpyxl')
+
             for index, row in df.iterrows():
                 group_name = row['Empresa'].replace(' ', '')
                 group, created = Group.objects.get_or_create(name=group_name)
+                
                 name = row['Nome'].replace(' ', '')
                 position = row['Cargo']
                 phone = row['Telefone'] if not pd.isnull(row['Telefone']) else ''
@@ -104,17 +112,40 @@ def load_data(request):
                 level = row['Nível']
                 area = row['Área']
                 service = row['Serviço']
-                #pylint: disable=E1101
+
+                # Verifica se a entrada já existe antes de criar uma nova
                 if not Escalation.objects.filter(name=name, group=group).exists():
-                    escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
+                    escalation = Escalation(
+                        name=name,
+                        position=position,
+                        phone=phone,
+                        email=email,
+                        level=level,
+                        area=area,
+                        service=service,
+                        group=group
+                    )
                     escalation.save()
+
             os.remove(file_path)
+
             messages.success(request, 'Dados carregados com sucesso.')
             return redirect('initial_page')
+
+        except pd.errors.EmptyDataError:
+            messages.error(request, 'O arquivo XLSX está vazio.')
+        except pd.errors.ParserError:
+            messages.error(request, 'Erro ao analisar o arquivo XLSX.')
+        except KeyError as e:
+            messages.error(request, f'Erro ao carregar dados. Coluna ausente: {e}')
         except Exception as e:
-            messages.error(request, 'Erro ao carregar dados. Verifique se o arquivo está no formato correto.')
-            return redirect('initial_page') 
-    messages.error(request, 'Não foi usado arquivo XLSX.')
+            messages.error(request, f'Erro ao carregar dados: {str(e)}')
+
+        return redirect('initial_page')
+
+    messages.error(request, 'Método HTTP não suportado.')
+    return redirect('initial_page')
+
 @login_required(login_url='login')
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
