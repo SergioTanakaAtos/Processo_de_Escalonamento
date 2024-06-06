@@ -26,15 +26,20 @@
                 {% endif %}
             </ul>
             <ul class="navbar-nav ml-auto">
-                {% if user.is_authenticated%}
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"> {{user}}</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Sair</a>
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown" id="userDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdownLink" role="button">
+                            {{ user }}
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="userDropdownLink">
+                            <a class="dropdown-item" href="{% url 'logout' %}">Sair</a>
+                        </div>
                     </li>
                 {% endif %}
             </ul>
+            
+            
+            
         </div>
     </div>
 </nav>

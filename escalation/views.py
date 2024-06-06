@@ -21,7 +21,6 @@ from django.contrib import messages
 @login_required(login_url='login')
 def initial_page(request):
     #pylint: disable=E1101
-    # message = messages.get_messages(request)
     groups = Group.objects.all()
     user = request.user
     group_states = {} 
