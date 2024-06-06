@@ -80,7 +80,7 @@ def edit_group(request):
 @csrf_exempt
 @login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
-def load_data(request):
+def load_data(request):    
     if request.method == 'POST':
         if 'xlsx_file' not in request.FILES:
             messages.error(request, 'Nenhum arquivo XLSX foi enviado.')
@@ -100,6 +100,12 @@ def load_data(request):
 
             # Lendo o arquivo XLSX
             df = pd.read_excel(file_path, engine='openpyxl')
+
+            # Verificação se o DataFrame está vazio
+            if df.empty:
+                messages.error(request, 'O arquivo XLSX está vazio.')
+                os.remove(file_path)
+                return redirect('initial_page')
 
             for index, row in df.iterrows():
                 group_name = row['Empresa'].replace(' ', '')
@@ -132,10 +138,6 @@ def load_data(request):
             messages.success(request, 'Dados carregados com sucesso.')
             return redirect('initial_page')
 
-        except pd.errors.EmptyDataError:
-            messages.error(request, 'O arquivo XLSX está vazio.')
-        except pd.errors.ParserError:
-            messages.error(request, 'Erro ao analisar o arquivo XLSX.')
         except KeyError as e:
             messages.error(request, f'Erro ao carregar dados. Coluna ausente: {e}')
         except Exception as e:
@@ -143,6 +145,7 @@ def load_data(request):
 
         return redirect('initial_page')
 
+        
     messages.error(request, 'Método HTTP não suportado.')
     return redirect('initial_page')
 
