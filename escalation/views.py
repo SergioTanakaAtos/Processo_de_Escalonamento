@@ -8,6 +8,7 @@ from .models import LogPermission
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse
 from django.http import JsonResponse    
@@ -17,6 +18,7 @@ from django.core.files.storage import FileSystemStorage
 import pandas as pd
 from django.contrib import messages
 
+@login_required(login_url='login')
 def initial_page(request):
     #pylint: disable=E1101
     # message = messages.get_messages(request)
@@ -38,6 +40,7 @@ def initial_page(request):
     return render(request, 'escalation/initial_page.html', {'group_states': group_states})
 
 @csrf_exempt
+@login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def save_group(request):
     if request.method == 'POST':
@@ -55,7 +58,9 @@ def save_group(request):
             return HttpResponse(status=400)
     messages.error(request, 'Método não permitido.')
     return HttpResponse(status=400)
+
 @csrf_exempt
+@login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def edit_group(request):
     if request.method == 'POST':
@@ -73,40 +78,44 @@ def edit_group(request):
     return render(request, 'initial_page.html')     
 
 @csrf_exempt
+@login_required(login_url='login')
 @user_passes_test(lambda u: u.is_superuser or u.is_staff)
 def load_data(request):
     if request.method == 'POST' and request.FILES['xlsx_file']:
-        xlsx_file = request.FILES['xlsx_file']
-        
-        upload_dir = os.path.join(settings.BASE_DIR, 'escalation/data')
-                
-        os.makedirs(upload_dir, exist_ok=True)
-        
-        fs = FileSystemStorage(location=upload_dir)
-        filename = fs.save(xlsx_file.name, xlsx_file)
-        
-        file_path = fs.path(filename)
-        df = pd.read_excel(file_path,engine='openpyxl')
-        for index, row in df.iterrows():
-            group_name = row['Empresa'].replace(' ', '')
-            group, created = Group.objects.get_or_create(name=group_name)
-            name = row['Nome'].replace(' ', '')
-            position = row['Cargo']
-            phone = row['Telefone'] if not pd.isnull(row['Telefone']) else ''
-            email = row['Email']
-            level = row['Nível']
-            area = row['Área']
-            service = row['Serviço']
-            #pylint: disable=E1101
-            if not Escalation.objects.filter(name=name, group=group).exists():
-                escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
-                escalation.save()
-
-        os.remove(file_path)
-        messages.success(request, 'Dados carregados com sucesso.')
-        return redirect('initial_page')    
+        try:
+            xlsx_file = request.FILES['xlsx_file']
+            
+            upload_dir = os.path.join(settings.BASE_DIR, 'escalation/data')
+                    
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            fs = FileSystemStorage(location=upload_dir)
+            filename = fs.save(xlsx_file.name, xlsx_file)
+            
+            file_path = fs.path(filename)
+            df = pd.read_excel(file_path,engine='openpyxl')
+            for index, row in df.iterrows():
+                group_name = row['Empresa'].replace(' ', '')
+                group, created = Group.objects.get_or_create(name=group_name)
+                name = row['Nome'].replace(' ', '')
+                position = row['Cargo']
+                phone = row['Telefone'] if not pd.isnull(row['Telefone']) else ''
+                email = row['Email']
+                level = row['Nível']
+                area = row['Área']
+                service = row['Serviço']
+                #pylint: disable=E1101
+                if not Escalation.objects.filter(name=name, group=group).exists():
+                    escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
+                    escalation.save()
+            os.remove(file_path)
+            messages.success(request, 'Dados carregados com sucesso.')
+            return redirect('initial_page')
+        except Exception as e:
+            messages.error(request, 'Erro ao carregar dados. Verifique se o arquivo está no formato correto.')
+            return redirect('initial_page') 
     messages.error(request, 'Não foi usado arquivo XLSX.')
-    
+@login_required(login_url='login')
 def escalation(request, group_id, user_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
@@ -119,7 +128,6 @@ def escalation(request, group_id, user_id):
     if not user_group_default.is_visualizer:
         messages.error(request, 'Usuário não tem permissão.')
         return redirect('initial_page')
-    
 
     escalation = Escalation.objects.filter(group=group)
     if not escalation:
@@ -128,7 +136,7 @@ def escalation(request, group_id, user_id):
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
 
 
-
+@login_required(login_url='login')
 def create_escalation(request, group_id):
     #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
