@@ -77,11 +77,13 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
-          <button type="button" class="btn btn-primary" data-dismiss="modal">Salvar</button>
+          <button type="button" class="btn btn-primary" onclick="updatePermissions()" data-dismiss="modal">Salvar</button>
         </div>
       </div>
     </div>
   </div>
+  {% endblock %}
+
   <!-- Modal end -->
 
   {% block script %}
@@ -104,12 +106,13 @@
 
           groups.innerHTML = ''
           title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`
-
+          
+          console.log(data)
           if (data.groups && data.groups.length > 0) {
             data.groups.forEach(group => {
               $('#groups').append(`
                 <li class="list-group-item">
-                  <input class="form-check-input me-1" type="checkbox" value="" id="groupCheckbox${group.id}" checked>
+                  <input class="form-check-input me-1 groupUserPermission" type="checkbox" id="${group.id}" checked>
                   <label class="form-check-label" for="groupCheckbox${group.id}">${group.name}</label>
                 </li>`
               );
@@ -124,10 +127,41 @@
           console.error('Erro ao buscar dados do usuário:', error);
           $('#groups').append('<li class="list-group-item">Erro ao buscar dados.</li>');
         }
+
         
         $('#staticBackdrop').modal('show');
       });
     });
+
+    async function updatePermissions() {
+      const permissions = document.querySelectorAll(".groupUserPermission");
+      let data = [];
+
+      console.log(permissions)
+      permissions.forEach(permission => {
+        
+        if(!permission.checked){
+          data.push({
+            id: permission.id
+          });
+        }
+        
+      });
+
+      try {
+        const response = await fetch('/user-groups/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        console.log('Success:', result);
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    }
   </script>
   {% endblock %}
-{% endblock %}

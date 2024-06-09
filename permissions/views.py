@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
-from escalation.models import LogPermission
+from escalation.models import LogPermission, UserGroupDefault
 from escalation.models import Group
 from django.contrib.auth import get_user 
 from django.contrib.auth.decorators import login_required
@@ -20,28 +20,33 @@ def permissions(request):
 @login_required(login_url='login')
 def save_permission(request, group_id):
  
-    if LogPermission.objects.filter(status='desactivate'):
+    if LogPermission.objects.filter(status='desactivate') or LogPermission.objects.filter(status='denied'):
         try: 
             permission = LogPermission.objects.filter(user=get_user(request), group=group_id).get()
             permission.status = 'pending'
             permission.save()
-            return redirect('permissions')
+            return redirect('initial_page')
         except LogPermission.DoesNotExist:
             return JsonResponse({'message':'Objeto com o usuário e grupo especificados não encontrado'}, status=404)
 
+
+
 @login_required(login_url='login')      
-def accepted_permission(request, permission_id):
+def action_permission(request, permission_id, action):
     permission = LogPermission.objects.filter(id=permission_id).get()
-    permission.status = 'activate'
-    permission.save()
-    return redirect('permissions')
 
-
-    
-def denied_permission(request, permission_id):
-    permission = LogPermission.objects.filter(id=permission_id).get()
-    permission.status = 'denied'
+    if action == "accepted":
+        permission.status = 'activate'
+        user_group = UserGroupDefault.objects.get_or_create(
+            group=permission.group,
+            user=permission.user,
+            is_visualizer=True
+        )
+    else:
+        permission.status = 'denied'
+        
     permission.save()
-    return redirect('permissions')
+    return redirect('initial_page')    
+        
 
 

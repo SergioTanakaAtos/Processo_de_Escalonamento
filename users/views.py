@@ -3,11 +3,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
-from escalation.models import LogPermission
+from escalation.models import LogPermission, UserGroupDefault
 from django.contrib.auth.models import Group
 from .registerForm import RegisterForm
-def register(request):
+from django.views.decorators.csrf import csrf_exempt
+import json
 
+
+
+def register(request):
     form = RegisterForm()
     groups = Group.objects.all()
     if request.method == 'POST':
@@ -58,9 +62,9 @@ def get_user_groups(request):
         try:
             id = int(request.GET.get('id'))
             user = User.objects.get(id=id)
-            groups_ids = LogPermission.objects.filter(user_id=id, status = 'activate').values_list('group_id', flat=True)
-            groups = Group.objects.filter(id__in=groups_ids)
-            data = list(groups.values('id', 'name'))
+            permission_groups = LogPermission.objects.filter(user_id=id, status = 'activate').values_list('group', flat=True)
+            groups = UserGroupDefault.objects.filter(group__in=permission_groups).values_list('group_id', flat=True)
+            data = list(Group.objects.filter(id__in=groups).values('id', 'name'))
 
             user_data = {
                 'id': user.id,
@@ -68,8 +72,40 @@ def get_user_groups(request):
                 'email': user.email,
             }
 
+            print(data)
             return JsonResponse({'groups': data, 'user': user_data})
         except (ValueError, ObjectDoesNotExist):
             return JsonResponse({'error': 'User not found or invalid id'}, status=400)
 
 
+
+@csrf_exempt
+def update_user_groups(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            permissions = data  
+       
+            for p in permissions:
+           
+                user_group = UserGroupDefault.objects.filter(id=p['id']).get()
+                # log_permission = LogPermission.objects.filter(user=user_group.group, group=user_group.group).get()
+                print("Usuário:", user_group.user)  
+                print("Grupos:", user_group.group)
+                # log_permission.status = 'desactivate'
+                # user_group.is_visualizer = False
+                
+                # log_permission.save()
+                # print(log_permission)
+                # print(user_group)
+
+
+            return JsonResponse({"message": "Success"}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON data"}, status=400)
+
+  
+
+        #     return JsonResponse({'groups': data, 'user': user_data})
+        # except (ValueError, ObjectDoesNotExist):
+        #     return JsonResponse({'error': 'User not found or invalid id'}, status=400)
