@@ -46,7 +46,7 @@ def action_permission(request, permission_id, action):
         permission.status = 'denied'
         
     permission.save()
-    return redirect('initial_page')    
+    return redirect('permissions')    
         
 
 
