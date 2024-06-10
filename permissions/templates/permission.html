@@ -8,8 +8,10 @@
   <div class="container">
     <h1>Permissões</h1>
 
-    {% if message %}
-      <div class="alert alert-info">{{ message }}</div>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+      {% endfor %}
     {% endif %}
 
     {% if permissions %}
