@@ -7,5 +7,6 @@ load_dotenv()
 
 if not User.objects.filter(username=os.getenv('SUPERUSER_NAME')).exists():
     User.objects.create_superuser(os.getenv('SUPERUSER_NAME'), os.getenv('SUPERUSER_EMAIL'), os.getenv('SUPERUSER_PASSWORD'))
-    
-print('Superuser already exists')
+    print("Superuser created")
+else:
+    print('Superuser already exists')
