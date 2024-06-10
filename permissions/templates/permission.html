@@ -1,72 +1,43 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 
-{% comment %} <style>
-    {% block style %}
-    
-    .box-card-permission{
-        display: flex;
-    }
-    
+{% block title %}
+  Permissões
+{% endblock %}
 
-    {% endblock style %}
-</style> {% endcomment %}
-
-{% block title %}Permissões{% endblock title %}
 {% block content %}
+  <div class="container">
+    <h1>Permissões</h1>
 
-    
-    <div class="container">
+    {% if message %}
+      <div class="alert alert-info">{{ message }}</div>
+    {% endif %}
 
-            
-            <h1>Permissões</h1>
-
-            
-            {% for p in permissions %}
-                
-                <div class="d-flex flex-row justify-content-between" style="width: 100%;">
-
-
-                    {% if admin %}
-
-                        <div class="desc-permission">
-                            <p>
-                                <b>{{ p.user}}</b> pede solicitação para: <br>
-                                {{ p.group}}
-                            </p>
-                        </div>    
-
-                        <div class="buttons-permissions">
-                            <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id%}" role="button">Confirmar</a>
-                            <a class="btn btn-primary" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
-                        </div>
-                        
-                    
-                    {% elif p.is_active != False  %}
-
-                        <div class="desc-permission">
-                            <p>
-                                <b>Solicitação de acesso para: </b><br>
-                                {{ p.group }}
-                            </p>
-                        </div>    
-
-                        <div class="permissions-status">
-                            {% if p.is_active %}
-                                <p style="background-color: #69AD8D; padding: 5px; border-radius: 10px; ">Permitido</p>
-                            {% else %}  
-                                <p style="background-color: #C7BF7F; padding: 5px; border-radius: 10px;">Pendente</p>
-                            {% endif %}
-                        </div>
-
-                    {% endif %}
-                    
-                 
-                    
-
-                </div>
-            {% endfor %}
-     
-    </div>
-   
-
-{% endblock content %}
+    {% if permissions %}
+      {% for p in permissions %}
+        <div class="d-flex flex-row justify-content-between" style="width: 100%;">
+          {% if admin %}
+            <div class="desc-permission">
+              <p>
+                <b>{{ p.user }}</b> pede solicitação para: <br />
+                {{ p.group }}
+              </p>
+            </div>
+            <div class="buttons-permissions">
+              <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">Confirmar</a>
+              <a class="btn btn-danger" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
+            </div>
+          {% else %}
+            <h1>Você não tem permissão para acessar essa página.</h1>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% else %}
+    <figure class="text-center">
+        <blockquote class="blockquote">
+          <p>Não há permissões</p>
+        </blockquote> 
+      </figure>
+ 
+    {% endif %}
+  </div>
+{% endblock %}

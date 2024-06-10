@@ -4,6 +4,7 @@ from escalation.models import LogPermission, UserGroupDefault
 from escalation.models import Group
 from django.contrib.auth import get_user 
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 @login_required(login_url='login')
 def permissions(request):
@@ -26,6 +27,7 @@ def save_permission(request, group_id):
             permission.status = 'pending'
             permission.save()
             return redirect('initial_page')
+        
         except LogPermission.DoesNotExist:
             return JsonResponse({'message':'Objeto com o usuário e grupo especificados não encontrado'}, status=404)
 
@@ -35,6 +37,7 @@ def save_permission(request, group_id):
 def action_permission(request, permission_id, action):
     permission = LogPermission.objects.filter(id=permission_id).get()
 
+   
     if action == "accepted":
         permission.status = 'activate'
         user_group = UserGroupDefault.objects.get_or_create(
@@ -42,11 +45,15 @@ def action_permission(request, permission_id, action):
             user=permission.user,
             is_visualizer=True
         )
+        msg_success = 'aceita'
     else:
         permission.status = 'denied'
+        msg_success = 'negada'
         
     permission.save()
-    return redirect('permissions')    
+    messages.success(request, f'Permissão {msg_success} como sucesso')
+    return render(request, 'permission.html', status=201)
+
         
 
 

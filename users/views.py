@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse
 from escalation.models import LogPermission, UserGroupDefault
 from django.contrib.auth.models import Group
 from .registerForm import RegisterForm
@@ -106,13 +106,11 @@ def update_user_groups(request):
                 
                 log_permission.save()
                 user_group.save()
-            
-            messages.success(request, 'Permissão alterada com sucesso')
-            return HttpResponse(status=200)
+  
+            return JsonResponse({"message": "Permissão alterada com sucesso"}, status=200)    
 
         except Group.DoesNotExist:
-            messages.success(request, 'Este grupo não existe!')
-            return HttpResponse(status=200)
+            return JsonResponse({"error": "Group not found"}, status=404)
         
         except User.DoesNotExist:
             return JsonResponse({"error": "User not found"}, status=404)
