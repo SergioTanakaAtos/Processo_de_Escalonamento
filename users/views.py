@@ -2,12 +2,14 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from escalation.models import LogPermission, UserGroupDefault
 from django.contrib.auth.models import Group
 from .registerForm import RegisterForm
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 
@@ -44,8 +46,11 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required(login_url='login')
 def get_users(request):
-    users = User.objects.all()
+    users = User.objects.filter(is_superuser=False)
     users_for_management = []
     for user in users:
         user_data = {
@@ -56,7 +61,9 @@ def get_users(request):
    
     return render(request, 'users/management.html', {'users': users_for_management})
  
- 
+
+
+@login_required(login_url='login')
 def get_user_groups(request):
     if request.method == "GET":
         try:
@@ -72,13 +79,14 @@ def get_user_groups(request):
                 'email': user.email,
             }
 
-            print(data)
+
             return JsonResponse({'groups': data, 'user': user_data})
         except (ValueError, ObjectDoesNotExist):
-            return JsonResponse({'error': 'User not found or invalid id'}, status=400)
+            return JsonResponse({'error': 'User not found or invalid id'}, status=404)
 
 
 
+@login_required(login_url='login')
 @csrf_exempt
 def update_user_groups(request):
     if request.method == "POST":
@@ -87,25 +95,34 @@ def update_user_groups(request):
             permissions = data  
        
             for p in permissions:
-           
-                user_group = UserGroupDefault.objects.filter(id=p['id']).get()
-                # log_permission = LogPermission.objects.filter(user=user_group.group, group=user_group.group).get()
-                print("Usuário:", user_group.user)  
-                print("Grupos:", user_group.group)
-                # log_permission.status = 'desactivate'
-                # user_group.is_visualizer = False
+                group = Group.objects.filter(id=int(p['group'])).get()
+                user = User.objects.filter(id=int(p['user'])).get()
+                user_group = UserGroupDefault.objects.filter(user=user, group=group, is_visualizer=True).get()
+                log_permission = LogPermission.objects.filter(user=user, group=group).get()
                 
-                # log_permission.save()
-                # print(log_permission)
-                # print(user_group)
+                log_permission.status = 'desactivate'
+                user_group.is_visualizer = False
 
+                
+                log_permission.save()
+                user_group.save()
+            
+            messages.success(request, 'Permissão alterada com sucesso')
+            return HttpResponse(status=200)
 
-            return JsonResponse({"message": "Success"}, status=200)
+        except Group.DoesNotExist:
+            messages.success(request, 'Este grupo não existe!')
+            return HttpResponse(status=200)
+        
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
+        
+        except UserGroupDefault.DoesNotExist:
+            return JsonResponse({"error": "UserGroupDefault not found"}, status=404)
+        
+        except LogPermission.DoesNotExist:
+             return JsonResponse({"error": "LogPermission not found"}, status=404)
+         
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
 
-  
-
-        #     return JsonResponse({'groups': data, 'user': user_data})
-        # except (ValueError, ObjectDoesNotExist):
-        #     return JsonResponse({'error': 'User not found or invalid id'}, status=400)

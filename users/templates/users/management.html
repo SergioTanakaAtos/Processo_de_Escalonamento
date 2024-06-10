@@ -106,13 +106,12 @@
 
           groups.innerHTML = ''
           title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`
-          
-          console.log(data)
+   
           if (data.groups && data.groups.length > 0) {
             data.groups.forEach(group => {
               $('#groups').append(`
                 <li class="list-group-item">
-                  <input class="form-check-input me-1 groupUserPermission" type="checkbox" id="${group.id}" checked>
+                  <input class="form-check-input me-1 groupUserPermission" type="checkbox" id="${group.id} ${data.user.id}" checked>
                   <label class="form-check-label" for="groupCheckbox${group.id}">${group.name}</label>
                 </li>`
               );
@@ -137,12 +136,18 @@
       const permissions = document.querySelectorAll(".groupUserPermission");
       let data = [];
 
-      console.log(permissions)
+     
+      
       permissions.forEach(permission => {
-        
+        const ids = permission.id.split(' ');  
+        const groupId = ids[0];               
+        const userId = ids[1];  
+
+
         if(!permission.checked){
           data.push({
-            id: permission.id
+            user: userId,
+            group: groupId
           });
         }
         
