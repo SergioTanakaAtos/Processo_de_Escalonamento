@@ -47,7 +47,8 @@ def save_group(request):
         if group_name:
             group_name_lower = group_name.lower()
             if Group.objects.filter(name__iexact=group_name_lower).exists():
-                return JsonResponse({'message':'O nome do grupo já existe.'}, status=400)
+                messages.error(request, 'Já existe um grupo com este nome.')
+                return HttpResponse(status=400)
             group = Group(name=group_name)
             group.save()
             messages.success(request, 'Grupo criado com sucesso.')

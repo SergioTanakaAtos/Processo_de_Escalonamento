@@ -53,7 +53,7 @@ class RegisterForm(UserCreationForm):
         email = cleaned_data.get('email')
 
         if email and not email.endswith('@atos.net'):
-            self.add_error(None, "O e-mail fornecido não é válido.")
+            self.add_error('email', "O e-mail fornecido não é válido.")
 
         return cleaned_data
 
