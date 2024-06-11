@@ -28,7 +28,6 @@ def register(request):
                 LogPermission.objects.create(user=user, group=group,status='pending')
             return redirect('login')
         errors = [error[0] for error in form.errors.values()]
-        print(errors)
         return render(request, 'users/register.html', {'form': form, 'errors': errors, 'groups': groups})
     return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
