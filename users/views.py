@@ -11,8 +11,6 @@ import json
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
-
-
 def register(request):
     form = RegisterForm()
     groups = Group.objects.all()

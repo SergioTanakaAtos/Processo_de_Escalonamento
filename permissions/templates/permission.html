@@ -14,19 +14,35 @@
       {% endfor %}
     {% endif %}
 
-    {% if permissions %}
-      {% for p in permissions %}
+    {% if users %}
+      {% for user in users %}
         <div class="d-flex flex-row justify-content-between" style="width: 100%;">
           {% if admin %}
-            <div class="desc-permission">
-              <p>
-                <b>{{ p.user }}</b> pede solicitação para: <br />
-                {{ p.group }}
-              </p>
-            </div>
-            <div class="buttons-permissions">
-              <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">Confirmar</a>
-              <a class="btn btn-danger" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
+            <div class="accordion" id="accordionExample{{ user.id }}" style="width: 100%;">
+              <div class="card">
+                <div class="card-header" id="heading{{ user.id }}">
+                  <h2 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ user.id }}" aria-expanded="true" aria-controls="collapse{{ user.id }}">
+                      {{ user.name }}
+                    </button>
+                  </h2>
+                </div>
+
+                <div id="collapse{{ user.id }}" class="collapse" aria-labelledby="heading{{ user.id }}" data-parent="#accordionExample{{ user.id }}">
+                  <div class="card-body">
+                    {% for p in user.per %}
+                      <div class="desc-permission" style="width: 100%; display: flex; justify-content: space-between;">
+                        <p>{{ p.group }}</p>
+
+                        <div class="buttons-permissions">
+                          <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">Confirmar</a>
+                          <a class="btn btn-danger" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
             </div>
           {% else %}
             <h1>Você não tem permissão para acessar essa página.</h1>
@@ -34,12 +50,11 @@
         </div>
       {% endfor %}
     {% else %}
-    <figure class="text-center">
+      <figure class="text-center">
         <blockquote class="blockquote">
           <p>Não há permissões</p>
         </blockquote> 
       </figure>
- 
     {% endif %}
   </div>
 {% endblock %}

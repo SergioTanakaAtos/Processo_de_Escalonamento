@@ -37,7 +37,7 @@
 }
 
 </style>
-{% endblock style%}
+{% endblock style %}
 {% block content %}
 <div class="container">
   <h1>Tabela de Dados</h1>
@@ -68,6 +68,7 @@
   {% for message in messages %}
     <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
       {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
   {% endfor %}
 </div>
@@ -92,14 +93,13 @@
                 {{ state }}
             </div>
           </td>
-      </td>      
       {% if state != 'Permitido' and state != 'Permissão pendente' %}
         <td>
           <a href="{% url 'create-permission' group_id=group.id %}">Solicitar</a>
         </td>
     {% endif %}
         <td>
-          {% if user.is_superuser or user.is_staff%}
+          {% if user.is_superuser or user.is_staff %}
             <div class="edit-controls">
                 <button class="btn btn-primary edit-button" data-group-id="{{ group.id }}">Editar</button>
                 <button class="btn btn-success confirm-button" style="display: none;">Confirmar</button>
@@ -117,20 +117,18 @@
 </div>
 
 <!-- Modal -->
-<div class="modal" tabindex="-1" role="dialog" id="myModal">
+<div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Adicionar Nova Empresa</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <h5 class="modal-title" id="myModalLabel">Adicionar Nova Empresa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <input type="text" id="newGroupName" class="form-control" placeholder="Nome da Empresa">
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
         <button type="button" class="btn btn-primary" id="saveGroup">Salvar</button>
       </div>
     </div>
@@ -140,7 +138,8 @@
 <script>
   $(document).ready(function () {
     document.getElementById("addButton").addEventListener("click", function() {
-      $('#myModal').modal('show');
+      var myModal = new bootstrap.Modal(document.getElementById('myModal'));
+      myModal.show();
     });
  
     document.getElementById("saveGroup").addEventListener("click", function() {
