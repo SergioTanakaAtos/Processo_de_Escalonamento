@@ -7,5 +7,6 @@ urlpatterns = [
     path('edit_group/',views.edit_group,name='edit_group'),
     path('escalation/<int:group_id>/<int:user_id>/', views.escalation, name='escalation'),
     path('create_escalation/<int:group_id>', views.create_escalation, name='create_escalation'),
+    path('update_escalation/', views.update_escalation, name='update_escalation'),
     path('load_data/', views.load_data, name='load_data'),
 ]

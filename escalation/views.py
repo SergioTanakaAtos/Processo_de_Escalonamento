@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import User
 from .models import Escalation
@@ -9,14 +10,16 @@ from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user 
 
 from django.http import HttpResponse
-from django.http import JsonResponse    
+from django.http import JsonResponse, HttpResponseRedirect   
 import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 import pandas as pd
 from django.contrib import messages
+import json
 
 @login_required(login_url='login')
 def initial_page(request):
@@ -193,5 +196,43 @@ def create_escalation(request, group_id):
             messages.success(request, 'Escalonamento criado com sucesso.')
             return render(request, 'escalation/create_escalation.html', {'group': group})
     return render(request, 'escalation/create_escalation.html', {'group': group})
+
+@login_required(login_url='login')
+@csrf_exempt
+def update_escalation(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            if Escalation.objects.filter(group=group, name=name).exists():
+                messages.error(request, 'Já existe um escalonamento com este nome.')
+                
+    
+            escalation = Escalation.objects.filter(id=data.get('id')).first()
+            if not escalation:
+                return JsonResponse({"error": "Escalation not found"}, status=404)
+
+            escalation.name = data.get('name')
+            escalation.position = data.get('position')
+            escalation.phone = data.get('phone')
+            escalation.email = data.get('email')
+            escalation.area = data.get('area')
+            escalation.service = data.get('service')
+            escalation.level = data.get('level')
+            group = data.get('group_id')        
+            id = get_user(request).id
+            escalation.save()
+            
+            messages.success(request, 'Escalação editada com sucesso')
+            url = reverse('escalation', kwargs={'group_id': group, 'user_id': id})
+            return JsonResponse({"url": url}, status=200)
+
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid method"}, status=405)
+       
 
 

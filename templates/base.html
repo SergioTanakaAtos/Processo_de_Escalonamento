@@ -8,6 +8,10 @@
     />
     {% block link_style %}
     {% endblock link_style %}
+
+    <script>
+        const csrftoken = "{{ csrf_token }}";
+    </script>
    
     <link
     rel="stylesheet"
