@@ -23,6 +23,18 @@ def permissions(request):
                 }
                 user_permissions_pending.append(user_per)
                 
+        users = User.objects.filter(is_staff=False)
+        user_permissions_pending = []
+        
+        for user in users:
+            if LogPermission.objects.filter(status='pending', user_id=user.id):
+                per = list(LogPermission.objects.filter(status='pending', user_id=user.id))
+                user_per = {
+                    "name": user.username,
+                    "per": per
+                }
+                user_permissions_pending.append(user_per)
+                
     else:    
         permissions = LogPermission.objects.filter(user=get_user(request))
    
@@ -53,6 +65,11 @@ def action_permission(request, permission_id, action):
     except UserGroupDefault.DoesNotExist:
         user_group = UserGroupDefault.objects.create(group=permission.group, user=permission.user)
     
+    user_group = UserGroupDefault.objects.filter(
+            group=permission.group,
+            user=permission.user
+        ).get()
+
     if action == "accepted":
         permission.status = 'activate'
         msg_success = 'aceita'
