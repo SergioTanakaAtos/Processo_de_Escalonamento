@@ -15,28 +15,31 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'initial_page' %}">Empresas</a>
                     </li>
-                {% endif %}
+                {%endif%}
                 {% if user.is_superuser %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'permissions' %}">Permissões</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'management' %}">Controle de acesso</a>
+                        <a class="nav-link" href="{% url "management" %}">Controle de acesso</a>
                     </li>
                 {% endif %}
             </ul>
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav ml-auto">
                 {% if user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdownLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <li class="nav-item dropdown" id="userDropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdownLink" role="button">
                             {{ user }}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownLink">
-                            <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
-                        </ul>
+                        <div class="dropdown-menu" aria-labelledby="userDropdownLink">
+                            <a class="dropdown-item" href="{% url 'logout' %}">Sair</a>
+                        </div>
                     </li>
                 {% endif %}
             </ul>
+            
+            
+            
         </div>
     </div>
 </nav>
