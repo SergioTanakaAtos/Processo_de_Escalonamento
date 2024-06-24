@@ -52,7 +52,7 @@
       {% for user in users %}
         <div class="card-users collapsed" data-id="{{ user.id }}">
           <i class="bi bi-person-fill" style="font-size: 40px; color: #073958;"></i>
-          <h4>{{ user.name }}</h4>
+          <h4>{{ user.name }}</h4> 
           <button class="btn-fechar" data-toggle="modal" data-target="#staticBackdrop">Ver acessos</button>
         </div>
       {% endfor %}
@@ -69,8 +69,11 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
+
         <div class="modal-body" id="modalContent" style="overflow-wrap: break-word;">
           <h5 id="title"></h5>
+          <button type="button" class="btn btn-primary" id="btt_update_staff" onclick="updateLevel()">Transformar em staff</button>
+          <br>
           <ul class="list-group" id="groups"></ul>
         </div>
         <div class="modal-footer">
@@ -101,6 +104,7 @@
           
           var groups = document.getElementById('groups')
           var title = document.getElementById('title')
+          var btt_staff = document.getElementById('btt_update_staff')
 
           groups.innerHTML = ''
           title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`
@@ -119,6 +123,14 @@
           } else {
             $('#groups').append('<li class="list-group-item">Nenhum grupo encontrado.</li>');
           }
+        
+         if(data.user.is_staff){
+            btt_staff.innerHTML = "Remover staff";
+  
+         }else{
+            btt_staff.innerHTML = "Adicionar staff";
+         }
+         
           
         } catch (error) {
           console.error('Erro ao buscar dados do usuário:', error);
@@ -170,6 +182,36 @@
 
     
 
+    }
+
+
+    async function updateLevel(){
+
+      const input = document.querySelectorAll('.form-check-input')[0]
+      const user_id = input.id.split(" ")[1]
+
+      const data = {
+        "id": user_id
+      }
+
+      console.log(data.id)
+
+      try {
+        const response = await fetch('../update-level-user/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        showMessage(result.message, 3000)
+      
+
+      } catch (error) {
+        showMessage(result.error, 3000)
+      }
     }
 
     const showMessage = (msg, duration) => {

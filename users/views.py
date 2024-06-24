@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from escalation import signals
 
 def register(request):
     form = RegisterForm()
@@ -76,6 +77,7 @@ def get_user_groups(request):
                 'id': user.id,
                 'username': user.username,
                 'email': user.email,
+                'is_staff': user.is_staff
             }
 
 
@@ -122,4 +124,44 @@ def update_user_groups(request):
          
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
+        
+        
+        
 
+@login_required(login_url='login')
+@csrf_exempt
+def update_level_user(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            user = User.objects.filter(id=data.get('id')).first()
+            
+            if user.is_staff == True:
+                user.is_staff = False
+                user.save()
+            
+                return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
+            
+            
+            user.is_staff = True
+            user.save()
+            
+            permissions = LogPermission.objects.filter(user=user)
+            permissions.exclude(status='activate').update(status='activate')
+             
+            user_groups = UserGroupDefault.objects.filter(user=user)
+            user_groups.filter(is_visualizer=False).update(is_visualizer=True)
+
+            groups = Group.objects.all()
+            
+            for group in groups:
+                if not UserGroupDefault.objects.filter(user=user, group=group).exists():
+                    UserGroupDefault.objects.create(user=user, group=group, is_visualizer=True)
+                if not LogPermission.objects.filter(user=user, group=group).exists():
+                    LogPermission.objects.create(user=user, group=group, status='activate')
+
+                
+            return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
+        
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)

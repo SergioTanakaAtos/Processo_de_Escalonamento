@@ -203,14 +203,20 @@ def update_escalation(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            
-            if Escalation.objects.filter(group=group, name=name).exists():
-                messages.error(request, 'Já existe um escalonamento com este nome.')
-                
+
     
             escalation = Escalation.objects.filter(id=data.get('id')).first()
+            
+            group = data.get('group_id')        
+            user = get_user(request).id
+            url = reverse('escalation', kwargs={'group_id': group, 'user_id': user})
+            
             if not escalation:
                 return JsonResponse({"error": "Escalation not found"}, status=404)
+            
+            
+            if Escalation.objects.filter(group=group, name=data.get('name')).exists():
+                return JsonResponse({"error": "Já existe uma escalação com esse nome.", "url": url}, status=409)
 
             escalation.name = data.get('name')
             escalation.position = data.get('position')
@@ -219,12 +225,9 @@ def update_escalation(request):
             escalation.area = data.get('area')
             escalation.service = data.get('service')
             escalation.level = data.get('level')
-            group = data.get('group_id')        
-            id = get_user(request).id
             escalation.save()
             
-            messages.success(request, 'Escalação editada com sucesso')
-            url = reverse('escalation', kwargs={'group_id': group, 'user_id': id})
+            
             return JsonResponse({"url": url}, status=200)
 
         except json.JSONDecodeError:

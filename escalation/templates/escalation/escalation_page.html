@@ -9,7 +9,7 @@
   </div>
 
 
-  <div class="alert alert-info ml-3" role="alert" id="message" style="display: none;"></div>
+ 
 
   <table id="escalationTable" class="table table-striped">
     {% if message %}
@@ -62,6 +62,9 @@
       <div class="modal-body">
         <form method="post">
           {% csrf_token %}
+
+          <div id="message" style="display: none;"></div>
+
           <input type="hidden" id="inp_id" value="">
           <div class="form-group">
             <label for="inp_name" class="col-form-label">Nome:</label>
@@ -95,7 +98,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-primary" id="btnSalvarAlteracoes" data-dismiss="modal">Salvar Alterações</button>
+        <button type="button" class="btn btn-primary" id="btnSalvarAlteracoes">Salvar Alterações</button>
       </div>
     </div>
   </div>
@@ -157,16 +160,37 @@
           body: JSON.stringify(data)
         });
 
+        const result = await response.json()
+        const message = document.getElementById('message');
+        const alertDiv = document.createElement('div');
+
         if (response.ok) {
-          const result = await response.json()
+          alertDiv.className = 'alert alert-success';
+          alertDiv.role = 'alert';
+          alertDiv.style.width = '100%';
+          alertDiv.textContent = `Escalanomento editado com sucesso!`;
           
-          window.location.href = result.url;
-
+          message.append(alertDiv);
+          message.style.display = 'flex';
           
-          console.log('Dados atualizados com sucesso');
-
+          setTimeout(() => {
+            window.location.href = result.url;
+          }, 2000);
 
         } else {
+
+            if(response.status === 409){
+
+              alertDiv.className = 'alert alert-danger';
+              alertDiv.role = 'alert';
+              alertDiv.style.width = '100%';
+              alertDiv.textContent = result.error;
+              
+              message.append(alertDiv);
+              message.style.display = 'flex';
+            
+              
+            }
           console.error('Falha ao atualizar dados:', response.status);
         }
       } catch (error) {

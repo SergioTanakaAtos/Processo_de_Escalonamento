@@ -9,6 +9,7 @@ urlpatterns = [
     path('get_groups/', views.get_user_groups, name='user_groups'),
     path('management/', views.get_users, name='management'),
     path('user-groups/', views.update_user_groups, name='update-user-groups'),
+    path('update-level-user/', views.update_level_user, name='update-level-user')
     
 ]
  
