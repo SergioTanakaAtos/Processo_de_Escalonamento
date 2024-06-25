@@ -3,84 +3,49 @@
 {% block title %}
   Permissões
 {% endblock %}
-{% block style %}
-<style>
-@media (max-width: 550px) {
-    .buttons-permissions {
-        display: flex;
-        flex-direction: column;
-    }
 
-    .buttons-permissions a {
-        margin-bottom: 10px;
-        width: 100%; 
-    }
-}
-
-.btn{
-    height: 40px;
-    margin-bottom: 10px;
-}
-</style>
-{% endblock style %}
 {% block content %}
-<div class="container">
+  <div class="container">
     <h1>Permissões</h1>
     {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-info">{{ message }}</div>
-        {% endfor %}
+      {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+      {% endfor %}
     {% endif %}
 
     {% if users %}
-        {% if admin %}
-            <div class="accordion" id="accordionExample" style="width: 100%;">
-                {% for user in users %}
-                    <div class="card">
-                        <div class="card-header" id="heading{{ user.id }}">
-                            <h2 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ user.id }}" aria-expanded="false" aria-controls="collapse{{ user.id }}">
-                                    {{ user.name }}
-                                </button>
-                            </h2>
-                        </div>
-                        <div id="collapse{{ user.id }}" class="collapse" aria-labelledby="heading{{ user.id }}" data-parent="#accordionExample">
-                            <div class="card-body">
-                                {% for p in user.per %}
-                                    <div class="desc-permission" style="width: 100%; display: flex; justify-content: space-between;">
-                                        <p>{{ p.group }}</p>
-                                        <div class="buttons-permissions">
-                                            <a class="btn btn-danger" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
-                                            <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">Confirmar</a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-                        </div>
+      {% if admin %}
+        <div class="accordion" id="accordionExample" style="width: 100%;">
+          {% for user in users %}
+            <div class="card">
+              <div class="card-header" id="heading{{ user.id }}">
+                <h2 class="mb-0"><button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ user.id }}" aria-expanded="false" aria-controls="collapse{{ user.id }}">{{ user.name }}</button></h2>
+              </div>
+              <div id="collapse{{ user.id }}" class="collapse {{ user.id }}" aria-labelledby="heading{{ user.id }}" data-parent="#accordionExample">
+                <div class="card-body">
+                  {% for p in user.per %}
+                    <div class="desc-permission" style="width: 100%; display: flex; justify-content: space-between;">
+                      <p>{{ p.group }}</p>
+                      <div class="buttons-permissions">
+                        <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">Confirmar</a>
+                        <a class="btn btn-danger" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
+                      </div>
                     </div>
-                {% endfor %}
+                  {% endfor %}
+                </div>
+              </div>
             </div>
-        {% else %}
-            <h1>Você não tem permissão para acessar essa página.</h1>
-        {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <h1>Você não tem permissão para acessar essa página.</h1>
+      {% endif %}
     {% else %}
-        <figure class="text-center">
-            <blockquote class="blockquote">
-                <p>Não há permissões</p>
-            </blockquote>
-        </figure>
+      <figure class="text-center">
+        <blockquote class="blockquote">
+          <p>Não há permissões</p>
+        </blockquote>
+      </figure>
     {% endif %}
-</div>
-{% endblock %}
-
-{% block script %}
-<script>
-    $(document).ready(function() {
-        $('#accordionExample').on('click', '.card-header button', function() {
-            var $collapse = $(this).closest('.card').find('.collapse');
-            $('#accordionExample .collapse.show').not($collapse).collapse('hide');
-            $collapse.collapse('toggle');
-        });
-    });
-</script>
+  </div>
 {% endblock %}

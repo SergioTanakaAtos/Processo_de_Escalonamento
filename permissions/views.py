@@ -30,6 +30,7 @@ def permissions(request):
             if LogPermission.objects.filter(status='pending', user_id=user.id):
                 per = list(LogPermission.objects.filter(status='pending', user_id=user.id))
                 user_per = {
+                    "id": user.id,
                     "name": user.username,
                     "per": per
                 }
