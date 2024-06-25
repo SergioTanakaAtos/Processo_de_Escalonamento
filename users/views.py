@@ -93,7 +93,6 @@ def update_user_groups(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            permissions = data['permissions']
             user = User.objects.filter(id=data['id']).first()
             
             if not data['is_staff']:
@@ -117,8 +116,8 @@ def update_user_groups(request):
                     if not LogPermission.objects.filter(user=user, group=group).exists():
                         LogPermission.objects.create(user=user, group=group, status='activate')     
        
-            if permissions:
-                for p in permissions:
+            if len(data['permissions']) != 0:
+                for p in data['permissions']:
                     group = Group.objects.filter(id=int(p['group'])).get()
                     user_per = User.objects.filter(id=int(p['user'])).get()
                     user_group = UserGroupDefault.objects.filter(user=user_per, group=group, is_visualizer=True).get()
