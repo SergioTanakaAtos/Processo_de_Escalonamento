@@ -80,7 +80,7 @@ def action_permission(request, permission_id, action):
         
     permission.save()
     user_group.save()
-    messages.success(request, f'Permissão {msg_success} como sucesso')
+    messages.success(request, f'Permissão {msg_success} com sucesso')
     return render(request, 'permission.html', status=201)
 
         
