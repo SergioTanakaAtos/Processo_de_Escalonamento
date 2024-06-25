@@ -19,7 +19,7 @@
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      justify-content: space-between;
+      justify-content: left;
       gap: 30px;
     }
     
@@ -36,6 +36,7 @@
     .btn-fechar:hover {
       background-color: #055070;
     }
+
   </style>
 {% endblock %}
 
@@ -69,10 +70,12 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-
         <div class="modal-body" id="modalContent" style="overflow-wrap: break-word;">
           <h5 id="title"></h5>
-          <button type="button" class="btn btn-primary" id="btt_update_staff" onclick="updateLevel()">Transformar em staff</button>
+          <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="customCheck1">
+            <label class="custom-control-label" for="customCheck1">Staff</label>
+          </div>
           <br>
           <ul class="list-group" id="groups"></ul>
         </div>
@@ -83,14 +86,25 @@
       </div>
     </div>
   </div>
-  {% endblock %}
+{% endblock %}
 
-  <!-- Modal end -->
-
-  {% block script %}
+{% block script %}
   <script>
+
+    $("#searchInput").on("keyup", function() {
+      var value = $(this).val().toLowerCase();
+      $(".card-users").each(function() {
+        var userName = $(this).find("h4").text().toLowerCase();
+        if (userName.includes(value)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    });
+
     $(document).ready(function() {
-      // Limpar a lista de grupos quando o modal for fechado
+ 
       $('#staticBackdrop').on('hidden.bs.modal', function() {
         $('#groups').empty();
       });
@@ -102,12 +116,15 @@
           const response = await fetch(`/get_groups/?id=${userId}`);
           const data = await response.json();
           
-          var groups = document.getElementById('groups')
-          var title = document.getElementById('title')
-          var btt_staff = document.getElementById('btt_update_staff')
+          var groups = document.getElementById('groups');
+          groups.classList.add(`${data.user.id}`) 
 
-          groups.innerHTML = ''
-          title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`
+          var title = document.getElementById('title');
+          var switch_staff = document.getElementById('customCheck1')
+          switch_staff.checked = data.user.is_staff
+
+          groups.innerHTML = '';
+          title.innerHTML = `Grupos que usuário ${data.user.username} tem acesso: <br><br>`;
    
           if (data.groups && data.groups.length > 0) {
             data.groups.forEach(group => {
@@ -118,53 +135,50 @@
                 </li>`
               );
             });
-
-
           } else {
             $('#groups').append('<li class="list-group-item">Nenhum grupo encontrado.</li>');
           }
-        
-         if(data.user.is_staff){
-            btt_staff.innerHTML = "Remover staff";
-  
-         }else{
-            btt_staff.innerHTML = "Adicionar staff";
-         }
          
           
+         
         } catch (error) {
           console.error('Erro ao buscar dados do usuário:', error);
           $('#groups').append('<li class="list-group-item">Erro ao buscar dados.</li>');
         }
 
-        
         $('#staticBackdrop').modal('show');
       });
     });
 
     async function updatePermissions() {
       const permissions = document.querySelectorAll(".groupUserPermission");
-      let data = [];
+      var classes = document.getElementById('groups').className.split(' ')
+      let id = classes[1]
+      let per = [];
 
-     
-      
+
       permissions.forEach(permission => {
         const ids = permission.id.split(' ');  
         const groupId = ids[0];               
         const userId = ids[1];  
-
-
         if(!permission.checked){
-          data.push({
+          per.push({
             user: userId,
-            group: groupId
+            group: groupId,
           });
         }
+
         
       });
 
+      const data = {
+        "is_staff": document.getElementById('customCheck1').checked,
+        "permissions": per,
+        "id": id
+      }
+
       try {
-        const response = await fetch('/user-groups/', {
+        const response = await fetch('/update-user-groups/', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -173,28 +187,20 @@
         });
 
         const result = await response.json();
-        showMessage(result.message, 3000)
+        showMessage(result.message, 3000);
       
-
       } catch (error) {
-        showMessage(result.error, 3000)
+        showMessage('Erro ao atualizar permissões', 3000);
       }
-
-    
-
     }
 
-
-    async function updateLevel(){
-
-      const input = document.querySelectorAll('.form-check-input')[0]
-      const user_id = input.id.split(" ")[1]
+    {% comment %} async function updateLevel(){
+      const input = document.querySelectorAll('.form-check-input')[0];
+      const user_id = input.id.split(" ")[1];
 
       const data = {
         "id": user_id
-      }
-
-      console.log(data.id)
+      };
 
       try {
         const response = await fetch('../update-level-user/', {
@@ -206,13 +212,12 @@
         });
 
         const result = await response.json();
-        showMessage(result.message, 3000)
+        showMessage(result.message, 3000);
       
-
       } catch (error) {
-        showMessage(result.error, 3000)
+        showMessage('Erro ao atualizar nível do usuário', 3000);
       }
-    }
+    } {% endcomment %}
 
     const showMessage = (msg, duration) => {
       const message = document.getElementById('message');
@@ -223,6 +228,5 @@
         message.style.display = 'none';
       }, duration);
     }
-    
   </script>
-  {% endblock %}
+{% endblock %}

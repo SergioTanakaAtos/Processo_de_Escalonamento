@@ -2,13 +2,17 @@
 {% block title %}Escalonamento{% endblock title %}
 {% block content %}
 <div class="container">
+  <br>
   <h2>Escalonamento > {{ group.name }}</h2>
 
-  <div class="d-flex mb-3">
-    <a href="{% url 'create_escalation' group_id=group.id %} " class="btn btn-primary">Adicionar Escalonamento</a>
-  </div>
 
-
+  {% if user.is_superuser or user.is_staff  %}
+    <div class="d-flex mb-3">
+      <a href="{% url 'create_escalation' group_id=group.id %} " class="btn btn-primary">Adicionar Escalonamento</a>
+    </div>
+    {% else %}
+    <br>
+  {% endif %}
  
 
   <table id="escalationTable" class="table table-striped">
@@ -26,7 +30,10 @@
           <th>Telefone</th>
           <th>Nível</th>
           <th>Serviço</th>
-          <th>Ações</th>
+          {% if user.is_superuser or user.is_staff  %}
+            <th>Ações</th>
+          {% endif %}
+          
         </tr>
       </thead>
       <tbody>
@@ -39,9 +46,11 @@
             <td>{{ item.phone }}</td>
             <td>{{ item.level }}</td>
             <td>{{ item.service }}</td>
+            {% if user.is_superuser or user.is_staff  %}
             <td>
               <button type="button" class="btn btn-primary edit-btn" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}">Editar</button>
             </td>
+            {% endif %}
           </tr>
         {% endfor %}
       </tbody>
@@ -189,7 +198,9 @@
               message.append(alertDiv);
               message.style.display = 'flex';
             
-              
+              setTimeout(() => {
+                message.removeChild(alertDiv)
+              }, 2000);
             }
           console.error('Falha ao atualizar dados:', response.status);
         }

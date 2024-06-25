@@ -93,75 +93,85 @@ def update_user_groups(request):
     if request.method == "POST":
         try:
             data = json.loads(request.body)
-            permissions = data  
-       
-            for p in permissions:
-                group = Group.objects.filter(id=int(p['group'])).get()
-                user = User.objects.filter(id=int(p['user'])).get()
-                user_group = UserGroupDefault.objects.filter(user=user, group=group, is_visualizer=True).get()
-                log_permission = LogPermission.objects.filter(user=user, group=group).get()
-                
-                log_permission.status = 'desactivate'
-                user_group.is_visualizer = False
+            permissions = data['permissions']
+            user = User.objects.filter(id=data['id']).first()
+            
+            if not data['is_staff']:
+                user.is_staff = False
+                user.save()
+            else:
+                user.is_staff = True
+                user.save()
+                    
+                permissions = LogPermission.objects.filter(user=user)
+                permissions.exclude(status='activate').update(status='activate')
+                    
+                user_groups = UserGroupDefault.objects.filter(user=user)
+                user_groups.filter(is_visualizer=False).update(is_visualizer=True)
 
+                groups = Group.objects.all()
+            
+                for group in groups:
+                    if not UserGroupDefault.objects.filter(user=user, group=group).exists():
+                        UserGroupDefault.objects.create(user=user, group=group, is_visualizer=True)
+                    if not LogPermission.objects.filter(user=user, group=group).exists():
+                        LogPermission.objects.create(user=user, group=group, status='activate')     
+       
+            if permissions:
+                for p in permissions:
+                    group = Group.objects.filter(id=int(p['group'])).get()
+                    user_per = User.objects.filter(id=int(p['user'])).get()
+                    user_group = UserGroupDefault.objects.filter(user=user_per, group=group, is_visualizer=True).get()
+                    log_permission = LogPermission.objects.filter(user=user_per, group=group).get()
+                    
+                    log_permission.status = 'desactivate'
+                    user_group.is_visualizer = False
+
+                    log_permission.save()
+                    user_group.save()
                 
-                log_permission.save()
-                user_group.save()
+            
+            
   
             return JsonResponse({"message": "Permissão alterada com sucesso"}, status=200)    
 
-        except Group.DoesNotExist:
-            return JsonResponse({"error": "Group not found"}, status=404)
-        
-        except User.DoesNotExist:
-            return JsonResponse({"error": "User not found"}, status=404)
-        
-        except UserGroupDefault.DoesNotExist:
-            return JsonResponse({"error": "UserGroupDefault not found"}, status=404)
-        
-        except LogPermission.DoesNotExist:
-             return JsonResponse({"error": "LogPermission not found"}, status=404)
-         
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
         
-        
-        
+    
 
-@login_required(login_url='login')
-@csrf_exempt
-def update_level_user(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)
-            user = User.objects.filter(id=data.get('id')).first()
+# def update_level_user(request):
+#     if request.method == "POST":
+#         try:
+#             data = json.loads(request.body)
+#             user = User.objects.filter(id=data.get('id')).first()
             
-            if user.is_staff == True:
-                user.is_staff = False
-                user.save()
+#             if user.is_staff == True:
+#                 user.is_staff = False
+#                 user.save()
             
-                return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
+#                 return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
             
             
-            user.is_staff = True
-            user.save()
+#             user.is_staff = True
+#             user.save()
             
-            permissions = LogPermission.objects.filter(user=user)
-            permissions.exclude(status='activate').update(status='activate')
+#             permissions = LogPermission.objects.filter(user=user)
+#             permissions.exclude(status='activate').update(status='activate')
              
-            user_groups = UserGroupDefault.objects.filter(user=user)
-            user_groups.filter(is_visualizer=False).update(is_visualizer=True)
+#             user_groups = UserGroupDefault.objects.filter(user=user)
+#             user_groups.filter(is_visualizer=False).update(is_visualizer=True)
 
-            groups = Group.objects.all()
+#             groups = Group.objects.all()
             
-            for group in groups:
-                if not UserGroupDefault.objects.filter(user=user, group=group).exists():
-                    UserGroupDefault.objects.create(user=user, group=group, is_visualizer=True)
-                if not LogPermission.objects.filter(user=user, group=group).exists():
-                    LogPermission.objects.create(user=user, group=group, status='activate')
+#             for group in groups:
+#                 if not UserGroupDefault.objects.filter(user=user, group=group).exists():
+#                     UserGroupDefault.objects.create(user=user, group=group, is_visualizer=True)
+#                 if not LogPermission.objects.filter(user=user, group=group).exists():
+#                     LogPermission.objects.create(user=user, group=group, status='activate')
 
                 
-            return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
+#             return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
         
-        except User.DoesNotExist:
-            return JsonResponse({"error": "User not found"}, status=404)
+#         except User.DoesNotExist:
+#             return JsonResponse({"error": "User not found"}, status=404)

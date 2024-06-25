@@ -216,7 +216,7 @@ def update_escalation(request):
             
             
             if Escalation.objects.filter(group=group, name=data.get('name')).exists():
-                return JsonResponse({"error": "Já existe uma escalação com esse nome.", "url": url}, status=409)
+                return JsonResponse({"error": "Já existe um escalonamento com esse nome.", "url": url}, status=409)
 
             escalation.name = data.get('name')
             escalation.position = data.get('position')
