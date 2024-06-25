@@ -54,7 +54,7 @@
         bottom: 0;
         right: 0;
         margin-bottom: 10px;
-        margin-right: 25px;
+        margin-right: 15px;
         width: 80px;
     }
  
@@ -115,9 +115,10 @@
         flex-direction: column;
         display: flex;
         border: solid 1px solid;
+        padding: 1px;
     }
 </style>
-<div class="container mt-2">
+<div class="container mt-1">
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center mb-1">Cadastro</h2>
@@ -160,7 +161,7 @@
                 </div>
             {% endif %}
             <div class="text-center mt-2">
-                <p>Já possui uma conta? <a href="{% url 'login' %}">Entre!</a></p>
+                <p>Já possui uma conta? <a style="text-decoration: none; color: #073958; font-weight: bolder;" href="{% url 'login' %}">Entre!</a></p>
             </div>
         </div>
     </div>
