@@ -33,6 +33,7 @@
           {% if user.is_superuser or user.is_staff  %}
             <th>Ações</th>
           {% endif %}
+          <th>Usou?</th>
           
         </tr>
       </thead>
@@ -50,8 +51,11 @@
             <td>
               <button type="button" class="btn btn-primary edit-btn" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}">Editar</button>
             </td>
+
             {% endif %}
-          </tr>
+            <td>
+              <input type="checkbox" id="checkbox_id" onclick="updateIsUsed()">
+          </td>
         {% endfor %}
       </tbody>
     {% endif %}
@@ -219,6 +223,29 @@
       message.style.display = 'none';
     }, duration);
   }
+  
+  $(document).ready(function() {
+    $('#checkbox_id').on('change', function() {
+        if ($(this).is(':checked')) {
+            $.ajax({
+                url: "{% url 'is_used' %}",
+                type: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json'
+                },
+                data: JSON.stringify({ is_used: true }),
+                success: function(response) {
+                    console.log('Checkbox atualizado com sucesso');
+                    // Aqui você pode manipular a resposta, se necessário
+                },
+                error: function(error) {
+                    console.error('Erro ao atualizar checkbox:', error);
+                }
+            });
+        }
+    });
+});
 </script>
 {% endblock %}
 

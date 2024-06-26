@@ -137,7 +137,7 @@ def update_user_groups(request):
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
         
-    
+
 
 # def update_level_user(request):
 #     if request.method == "POST":

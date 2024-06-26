@@ -239,3 +239,17 @@ def update_escalation(request):
        
 
 
+# def used_checkbox(request):
+#     if request.method == 'POST':
+#         try:
+#             data = json.loads(request.body)
+#             escalation = Escalation.objects.filter(id=data.get('id')).first()
+#             if not escalation:
+#                 return JsonResponse({"error": "Escalation not found"}, status=404)
+#             escalation.is_used = data.get('is_used')
+#             escalation.save()
+#             return JsonResponse({"success": "Is used updated"}, status=200)
+#         except json.JSONDecodeError:
+#             return JsonResponse({"error": "Invalid JSON"}, status=400)
+#         except Exception as e:
+#             return JsonResponse({"error": str(e)}, status=500)
