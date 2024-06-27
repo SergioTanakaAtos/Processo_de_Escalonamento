@@ -6,14 +6,15 @@ from django.contrib.auth.models import User
 from .models import Escalation
 from .models import UserGroupDefault
 from .models import LogPermission
+from .models import UserEscalationIsUsed
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user 
+from django.utils import timezone
 
-from django.http import HttpResponse
-from django.http import JsonResponse, HttpResponseRedirect   
+from django.http import JsonResponse, HttpResponseRedirect,HttpResponse
 import os
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -238,18 +239,22 @@ def update_escalation(request):
         return JsonResponse({"error": "Invalid method"}, status=405)
        
 
+@csrf_exempt
+def used_checkbox(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            if data.get('is_used'):
+                user = get_user(request)
+                escalation_id = data.get('escalation_id')
+                escalation = Escalation.objects.get(id=escalation_id)
+                date_time = timezone.now()
+                formatted_date_time = date_time.strftime('%Y-%m-%d %H:%M:%S')
 
-# def used_checkbox(request):
-#     if request.method == 'POST':
-#         try:
-#             data = json.loads(request.body)
-#             escalation = Escalation.objects.filter(id=data.get('id')).first()
-#             if not escalation:
-#                 return JsonResponse({"error": "Escalation not found"}, status=404)
-#             escalation.is_used = data.get('is_used')
-#             escalation.save()
-#             return JsonResponse({"success": "Is used updated"}, status=200)
-#         except json.JSONDecodeError:
-#             return JsonResponse({"error": "Invalid JSON"}, status=400)
-#         except Exception as e:
-#             return JsonResponse({"error": str(e)}, status=500)
+                is_used = UserEscalationIsUsed.objects.create(escalation=escalation, user=user, date=formatted_date_time)
+                is_used.save()    
+                return JsonResponse({"success": "Is used updated","datetime":formatted_date_time}, status=200)
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)

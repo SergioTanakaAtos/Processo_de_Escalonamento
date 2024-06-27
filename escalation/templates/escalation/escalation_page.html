@@ -14,7 +14,11 @@
     <br>
   {% endif %}
  
-
+    <div id="datetime-display" class="container mt-3" style="display: none;">
+      <div class="alert alert-info" role="alert">
+          <p id="datetime-info" class="mb-0"></p>
+      </div>
+    </div>
   <table id="escalationTable" class="table table-striped">
     {% if message %}
       <tr>
@@ -54,8 +58,8 @@
 
             {% endif %}
             <td>
-              <input type="checkbox" id="checkbox_id" onclick="updateIsUsed()">
-          </td>
+              <input type="checkbox" class="escalation-checkbox" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)">
+            </td>
         {% endfor %}
       </tbody>
     {% endif %}
@@ -224,28 +228,38 @@
     }, duration);
   }
   
-  $(document).ready(function() {
-    $('#checkbox_id').on('change', function() {
-        if ($(this).is(':checked')) {
-            $.ajax({
-                url: "{% url 'is_used' %}",
-                type: 'POST',
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/json'
-                },
-                data: JSON.stringify({ is_used: true }),
-                success: function(response) {
-                    console.log('Checkbox atualizado com sucesso');
-                    // Aqui você pode manipular a resposta, se necessário
-                },
-                error: function(error) {
-                    console.error('Erro ao atualizar checkbox:', error);
-                }
-            });
-        }
-    });
-});
+  function updateIsUsed(checkbox) {
+    var escalation_id = $(checkbox).data('escalation-id');
+    console.log('Escalation ID:', escalation_id); 
+    if (checkbox.checked) {
+        $.ajax({
+            url: "{% url 'is_used' %}",
+            type: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            data: JSON.stringify({ 
+                is_used: true,
+                escalation_id: escalation_id 
+            }),
+            success: function(response) {
+                console.log('Checkbox atualizado com sucesso');
+                console.log('Data e hora:', response.datetime);
+
+                $('#datetime-info').text('Escalonamento usado às: ' + response.datetime);
+                $('#datetime-display').show(); 
+                setTimeout(function() {
+                  window.location.reload();
+                }, 3000);
+            },
+            error: function(error) {
+                console.error('Erro ao atualizar checkbox:', error);
+                window.location.reload()
+            }
+        });
+    }
+}
 </script>
 {% endblock %}
 
