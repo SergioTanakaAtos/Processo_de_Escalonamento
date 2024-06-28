@@ -13,6 +13,7 @@
       justify-content: center;
       align-items: center;
       transition: height 0.3s;
+      border-radius: 5px;
     }
     
     .container-user {
@@ -36,7 +37,6 @@
     .btn-fechar:hover {
       background-color: #055070;
     }
-
   </style>
 {% endblock %}
 
@@ -80,7 +80,7 @@
           <ul class="list-group" id="groups"></ul>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary btn-danger" data-dismiss="modal">Fechar</button>
           <button type="button" class="btn btn-primary" onclick="updatePermissions()" data-dismiss="modal">Salvar</button>
         </div>
       </div>

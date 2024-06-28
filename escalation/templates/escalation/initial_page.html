@@ -75,6 +75,14 @@ td.request-cell {
       margin-bottom: 10px;
   }
 }
+
+.btnAdd{
+  margin-bottom: 10px;
+  border-radius: 5px;
+  border: none;
+  height: 35px;
+  margin-left: 10px;
+}
 </style>
 {% endblock style%}
 {% block content %}
@@ -83,7 +91,7 @@ td.request-cell {
   <div class="d-flex mb-3"> 
     <input type="text" id="searchInput" class="form-control w-25" placeholder="Pesquisar..." >    
     {% if user.is_superuser or user.is_staff %}
-      <button id="addButton" class="btn btn-primary">Adicionar</button>
+      <button id="addButton" class="btnAdd btn-primary">Adicionar</button>
     {% endif %}
   </div>
 

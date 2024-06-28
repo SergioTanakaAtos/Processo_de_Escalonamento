@@ -1,5 +1,22 @@
+{% load static %}
+{% block style %}
+<style>
+    .navbar-custom {
+        width: 100%;
+        z-index: 1000;
+        padding: 10px 0;
+        justify-content: center;
+    }
 
-
+    .navbar-custom .navbar-nav .nav-link {
+        color: #fff;
+        padding: 10px 10px;
+        background-color: #073958;
+        justify-content: center;
+    }
+</style>
+{% endblock style%}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
     <div class="container-fluid">
     
@@ -10,40 +27,39 @@
         
         <!-- Itens da Navbar -->
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
+            <ul class="navbar-nav me-auto">
                 {% if user.is_authenticated %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'initial_page' %}">Empresas</a>
                     </li>
-                {%endif%}
+                {% endif %}
                 {% if user.is_superuser %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'permissions' %}">Permissões</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url "management" %}">Controle de acesso</a>
+                        <a class="nav-link" href="{% url 'management' %}">Controle de acesso</a>
                     </li>
                 {% endif %}
             </ul>
-            <ul class="navbar-nav ml-auto">
+            
+            <ul class="navbar-nav ms-auto">
                 {% if user.is_authenticated %}
-                    <li class="nav-item dropdown" id="userDropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdownLink" role="button">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdownLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ user }}
                         </a>
-                        <div class="dropdown-menu" aria-labelledby="userDropdownLink">
-                            <a class="dropdown-item" href="{% url 'logout' %}">Sair</a>
-                        </div>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdownLink">
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Sair</a></li>
+                        </ul>
                     </li>
                 {% endif %}
             </ul>
-            
-            
             
         </div>
     </div>
 </nav>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         var navbarToggle = document.querySelector(".navbar-toggler");
@@ -51,8 +67,10 @@
         navbarToggle.addEventListener("click", function() {
             var isExpanded = navbarToggle.getAttribute("aria-expanded") === "true";
 
-            navbarToggle.setAttribute("aria-expanded", !isExpanded);
-            navbarToggle.classList.toggle("collapsed");
+            navbarToggle.setAttribute("aria-expanded", String(!isExpanded));
+
+            var navbarNav = document.querySelector("#navbarNav");
+            navbarNav.classList.toggle("show");
         });
     });
 </script>
