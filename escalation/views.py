@@ -52,7 +52,7 @@ def save_group(request):
             group_name_lower = group_name.lower()
             if Group.objects.filter(name__iexact=group_name_lower).exists():
                 messages.error(request, 'Já existe um grupo com este nome.')
-                return HttpResponse(status=400)
+                return HttpResponse(status=409)
             group = Group(name=group_name)
             group.save()
             messages.success(request, 'Grupo criado com sucesso.')
@@ -79,7 +79,8 @@ def edit_group(request):
         messages.success(request, 'Grupo editado com sucesso.')
         return HttpResponse(status=200)
     
-    return render(request, 'initial_page.html')     
+    messages.error(request, 'Método não permitido.')
+    return render(request, 'escalation/initial_page.html', status=403)     
 
 @csrf_exempt
 @login_required(login_url='login')
