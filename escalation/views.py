@@ -156,22 +156,22 @@ def load_data(request):
 
 @login_required(login_url='login')
 def escalation(request, group_id, user_id):
-    #pylint: disable=E1101
-    group = Group.objects.get(id=group_id)
-    user = User.objects.get(id=user_id)
+    try:
+        group = Group.objects.get(id=group_id)
+        user = User.objects.get(id=user_id)
+    except (Group.DoesNotExist, User.DoesNotExist):
+        messages.error(request, f'Grupo ou usuário não encontrado.')
+        return redirect('initial_page')
     
     user_group_default = UserGroupDefault.objects.filter(group=group, user=user).first()
-    if user_group_default is None:
-        messages.error(request, f'Usuário não tem acesso no(a) {group}.')
-        return redirect('initial_page')
-    if not user_group_default.is_visualizer:
+    if not user_group_default or not user_group_default.is_visualizer:
         messages.error(request, f'Usuário não tem permissão no(a) {group}. Contate o administrador.')
         return redirect('initial_page')
 
     escalation = Escalation.objects.filter(group=group)
     if not escalation:
         messages.error(request, 'Não há escalonamento cadastrado para este grupo.')
-        return render(request, 'escalation/escalation_page.html', {'group': group})
+    
     return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
 
 
