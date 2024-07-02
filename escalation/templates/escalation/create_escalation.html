@@ -1,62 +1,114 @@
-{% extends 'base.html'%}
+{% extends 'base.html' %}
 
 {% block title %}Adicionar Escalonamento{% endblock title %}
+
+{% block style %}
+<style>
+    .is-invalid {
+        border-color: red;
+    }
+
+    .alert {
+        transition: opacity 0.5s ease-out;
+    }
+
+    .fade-out {
+        opacity: 0;
+    }
+
+</style>
+{% endblock style %}
+
 {% block content %}
 <div class="container">
-    
-
     <h1>Adicionar Escalonamento</h1>
 
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
 
-    <form method="POST">
+    <form method="POST" action="{% url 'create_escalation' group_id=group.id %}">
         {% csrf_token %}
         <div class="form-group">
-            <form action="{% url 'create_escalation' group_id=group.id %}" method="post">
-                
-                <div class="mb-3">
-                    <label for="name" class="form-label">Nome: </label>
-                    <input type="text" class="form-control" id="name" placeholder="Digite o nome" name="name">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email: </label>
-                    <input type="email" class="form-control" id="email" placeholder="Digite o email" name="email">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="position" class="form-label">Cargo: </label>
-                    <input type="text" class="form-control" id="position" placeholder="Digite a posição" name="position">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="phone" class="form-label">Telefone: </label>
-                    <input type="text" class="form-control" id="phone" placeholder="Digite o telefone" name="phone">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="area" class="form-label">Área: </label>
-                    <input type="text" class="form-control" id="area" placeholder="Digite a área" name="area">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="service" class="form-label">Serviço: </label>
-                    <input type="text" class="form-control" id="service" placeholder="Digite o serviço" name="service">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="level" class="form-label">Nível: </label>
-                    <input type="text" class="form-control" id="level" placeholder="Digite o nível do escalonamento" name="level">
-                </div>
-                
+            <div class="mb-3">
+                <label for="name" class="form-label">Nome: </label>
+                <input type="text" class="form-control" id="name" placeholder="Digite o nome" name="name_new_escalation">
+            </div>
 
-                <button type="submit" class="btn btn-primary">Salvar</button>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email: </label>
+                <input type="email" class="form-control" id="email" placeholder="Digite o email" name="email">
+            </div>
 
-            </form>
-            {% if message %}
-                <div class="alert alert-danger">
-                    {{ message }}
-                </div>
-            {% endif %}
+            <div class="mb-3">
+                <label for="position" class="form-label">Cargo: </label>
+                <input type="text" class="form-control" id="position" placeholder="Digite a posição" name="position">
+            </div>
+
+            <div class="mb-3">
+                <label for="phone" class="form-label">Telefone: </label>
+                <input type="text" class="form-control" id="phone" placeholder="Digite o telefone" name="phone">
+            </div>
+
+            <div class="mb-3">
+                <label for="area" class="form-label">Área: </label>
+                <input type="text" class="form-control" id="area" placeholder="Digite a área" name="area">
+            </div>
+
+            <div class="mb-3">
+                <label for="service" class="form-label">Serviço: </label>
+                <input type="text" class="form-control" id="service" placeholder="Digite o serviço" name="service">
+            </div>
+
+            <div class="mb-3">
+                <label for="level" class="form-label">Nível: </label>
+                <input type="text" class="form-control" id="level" placeholder="Digite o nível do escalonamento" name="level">
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btt_salvar">Salvar</button>
         </div>
     </form>
-{%endblock%}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    document.getElementById('btt_salvar').addEventListener('click', function(event) {
+        let isValid = true;
+        const fields = ['name', 'email', 'position', 'area', 'service', 'level'];
+
+        fields.forEach(function(field) {
+            const input = document.getElementById(field);
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            event.preventDefault();
+        }
+    });
+
+    window.addEventListener('load', function() {
+        const alerts = document.querySelectorAll('.alert');
+
+        if (alerts.length > 0) {
+            setTimeout(function() {
+                alerts.forEach(function(alert) {
+                    alert.classList.add('fade-out');
+                    setTimeout(function() {
+                        alert.style.display = 'none';
+                    }, 500);
+                });
+            }, 3000);
+        }
+    });
+</script>
+{% endblock script %}

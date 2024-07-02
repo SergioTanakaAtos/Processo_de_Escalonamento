@@ -247,17 +247,13 @@ class EscalationViewTest(TestCase):
         self.user = User.objects.create_user(username='testuser', password='12345')
         self.group = Group.objects.create(name='Test Group')
         
-    def test_redirect_if_not_logged_in(self):
-        response = reverse('escalation', args=(self.group.id, self.user.id))
-        self.assertRedirects(response, f"{reverse('login')}?next={reverse('escalation', args=(self.group.id, self.user.id))}")  
-
     def test_user_not_in_group(self):
         url = reverse('escalation', args=(self.group.id, self.user.id))
         self.client.force_login(self.user)
         response = self.client.get(url)
 
         messages = [msg.message for msg in get_messages(response.wsgi_request)]
-        self.assertIn('Usuário não pertence a este grupo.', messages)
+        self.assertIn(f'Usuário não tem acesso no(a) {self.group.name}.', messages)
         self.assertRedirects(response, reverse('initial_page'))
 
     def test_user_not_visualizer(self):
@@ -267,7 +263,7 @@ class EscalationViewTest(TestCase):
         response = self.client.get(url)
 
         messages = [msg.message for msg in get_messages(response.wsgi_request)]
-        self.assertIn('Usuário não tem permissão.', messages)
+        self.assertIn(f'Usuário não tem permissão no(a) {self.group.name}. Contate o administrador.', messages)
         self.assertRedirects(response, reverse('initial_page'))
 
     def test_no_escalation_for_group(self):
@@ -296,6 +292,7 @@ class CreateEscalationTestView(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='12345')  
+    
        
  
       

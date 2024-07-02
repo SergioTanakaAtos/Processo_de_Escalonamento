@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
 {% block title %}Escalonamento{% endblock title %}
+
+{% block style %}
+<style>
+
+    .alert {
+        transition: opacity 0.5s ease-out;
+    }
+
+    .fade-out {
+        opacity: 0;
+    }
+
+</style>
+{% endblock style %}
+
 {% block content %}
 <div class="container">
   <br>
@@ -13,6 +28,15 @@
     {% else %}
     <br>
   {% endif %}
+
+  
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
  
     <div id="datetime-display" class="container mt-3" style="display: none;">
       <div class="alert alert-info" role="alert">
@@ -260,6 +284,20 @@
         });
     }
 }
+
+  window.addEventListener('load', function() {
+    const alerts = document.querySelectorAll('.alert');
+    if (alerts.length > 0) {
+        setTimeout(function() {
+            alerts.forEach(function(alert) {
+                alert.classList.add('fade-out');
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 3000);
+    }
+  });
 </script>
 {% endblock %}
 

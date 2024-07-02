@@ -177,26 +177,33 @@ def escalation(request, group_id, user_id):
 
 @login_required(login_url='login')
 def create_escalation(request, group_id):
-    #pylint: disable=E1101
     group = Group.objects.get(id=group_id)
-    
     if request.method == 'POST':
-        name = request.POST.get('name')
-        if Escalation.objects.filter(group=group, name=name).exists():
-            messages.error(request, 'Já existe um escalonamento com este nome.')
-            return render(request,'escalation/create_escalation.html', {'group': group})
-        else:
-            position = request.POST.get('position')
-            phone = request.POST.get('phone')
-            email = request.POST.get('email')
-            area = request.POST.get('area')
-            service = request.POST.get('service')
-            level = request.POST.get('level')
-            escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
+        
+        name = request.POST.get('name_new_escalation')
+        position = request.POST.get('position')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        area = request.POST.get('area')
+        service = request.POST.get('service')
+        level = request.POST.get('level')
+        
+        if name and position and email and area and service and level:
             
-            escalation.save()
-            messages.success(request, 'Escalonamento criado com sucesso.')
+            if Escalation.objects.filter(group=group, name=name).exists():
+                messages.error(request, 'Já existe um escalonamento com este nome.')
+                return render(request,'escalation/create_escalation.html', {'group': group})
+            
+            else:
+                escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
+                escalation.save()
+                messages.success(request, 'Escalonamento criado com sucesso.')
+                url = reverse('escalation', kwargs={'group_id': group_id, 'user_id': get_user(request).id})
+                return redirect(url)
+        else:
+            messages.error(request, 'Preencha todos os campos necessários')
             return render(request, 'escalation/create_escalation.html', {'group': group})
+        
     return render(request, 'escalation/create_escalation.html', {'group': group})
 
 @login_required(login_url='login')
