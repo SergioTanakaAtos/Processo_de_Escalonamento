@@ -162,10 +162,10 @@ def escalation(request, group_id, user_id):
     
     user_group_default = UserGroupDefault.objects.filter(group=group, user=user).first()
     if user_group_default is None:
-        messages.error(request, 'Usuário não pertence a este grupo.')
+        messages.error(request, f'Usuário não tem acesso no(a) {group}.')
         return redirect('initial_page')
     if not user_group_default.is_visualizer:
-        messages.error(request, 'Usuário não tem permissão.')
+        messages.error(request, f'Usuário não tem permissão no(a) {group}. Contate o administrador.')
         return redirect('initial_page')
 
     escalation = Escalation.objects.filter(group=group)
