@@ -28,8 +28,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
-
 MESSAGE_TAGS = {
     messages.DEBUG: 'debug',
     messages.INFO: 'info',
@@ -51,7 +49,6 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'escalation.apps.EscalationConfig',
     'permissions.apps.PermissionsConfig',
-    
 ]
 
 MIDDLEWARE = [

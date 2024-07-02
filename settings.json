@@ -1,0 +1,21 @@
+{
+    "python.pythonPath": "/path/to/your/python/interpreter",
+    "python.envFile": "${workspaceFolder}/.env",
+    "python.testing.unittestEnabled": true,
+    "python.testing.unittestPath": "${workspaceFolder}/env/bin/python -m unittest",
+    "python.testing.nosetestsEnabled": true,
+    "python.testing.nosetestsPath": "${workspaceFolder}/env/bin/nosetests",
+    "python.testing.defaultTestDirectory": "${workspaceFolder}/tests",
+    "python.testing.cwd": "${workspaceFolder}",
+    "python.testing.autoTestDiscoverOnSaveEnabled": true,
+    "python.unitTest.unittestArgs": [
+        "-v",
+        "-s",
+        "tests",
+        "-p",
+        "*test*.py",
+        "--settings=app.settings_test",
+        "--with-coverage",
+        "--cover-package=app"
+    ]
+}

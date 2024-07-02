@@ -80,7 +80,7 @@ def edit_group(request):
         return HttpResponse(status=200)
     
     messages.error(request, 'Método não permitido.')
-    return render(request, 'escalation/initial_page.html', status=403)     
+    return render(request, 'escalation/initial_page.html', status=405)
 
 @csrf_exempt
 @login_required(login_url='login')

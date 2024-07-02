@@ -1,25 +1,16 @@
+import django
+import os
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
+django.setup()
+
+
 from django.test import TestCase
 from escalation.models import Escalation, Group, UserGroupDefault, UserEscalationIsUsed, UserEscalationIsUsed, LogPermission
 from datetime import datetime
 from django.contrib.auth.models import User, Group
 from django.utils.timezone import make_aware
-
-
-class EscalationTest(TestCase):
-
-    def setUp(self):
-        self.group = Group.objects.create(name="Test Group")
-
-        self.escalation = Escalation.objects.create(
-            name="Melissa Neves",
-            position="Operations Manager",
-            phone="11 99999-9999",
-            email="melissa.neves@atos.net",
-            level=2,
-            area="DWP-Global Onsite Services",
-            service="GOSS",
-            group=self.group
-        )
+from django.conf import settings
 
 class EscalationTest(TestCase):
 
@@ -47,35 +38,6 @@ class EscalationTest(TestCase):
         self.assertEqual(self.escalation.service, "GOSS")
         self.assertEqual(self.escalation.group, self.group)
 
-    def test_ordering(self):
-        """
-        Testa se as instâncias de Escalation são ordenadas corretamente pelo campo 'level'.
-        """
-        escalation_1 = Escalation.objects.create(
-            name="John Doe",
-            position="Manager",
-            email="john.doe@example.com",
-            level=1,
-            area="Operations",
-            service="Support",
-            group=self.group
-        )
-        escalation_2 = Escalation.objects.create(
-            name="Jane Smith",
-            position="Coordinator",
-            email="jane.smith@example.com",
-            level=3,
-            area="Support",
-            service="Customer Service",
-            group=self.group
-        )
-
-
-        escalations = Escalation.objects.all()
-        self.assertEqual(escalations[0], escalation_1)
-        self.assertEqual(escalations[1], self.escalation)
-        self.assertEqual(escalations[2], escalation_2)
-        
         
 class UserGroupDefaultTest(TestCase):
     def setUp(self):

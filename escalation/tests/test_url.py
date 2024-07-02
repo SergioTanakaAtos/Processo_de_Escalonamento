@@ -1,3 +1,9 @@
+import django
+import os
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
+django.setup()
+
 from django.test import SimpleTestCase
 from django.urls import reverse, resolve
 from escalation.views import initial_page, escalation, save_group, create_escalation, edit_group, update_escalation, load_data, used_checkbox
