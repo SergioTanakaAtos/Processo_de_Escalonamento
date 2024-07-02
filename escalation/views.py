@@ -188,7 +188,7 @@ def create_escalation(request, group_id):
         service = request.POST.get('service')
         level = request.POST.get('level')
         
-        if name and position and email and area and service and level:
+        if all([name, position, email, area, service, level]):
             
             if Escalation.objects.filter(group=group, name=name).exists():
                 messages.error(request, 'Já existe um escalonamento com este nome.')
