@@ -1,7 +1,7 @@
 from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
-from escalation.models import LogPermission, Escalation, UserGroupDefault
+from escalation.models import LogPermission, Escalation, UserGroupDefault, UserEscalationIsUsed
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 import pandas as pd
@@ -9,7 +9,7 @@ import os
 from io import BytesIO
 import os
 import django
-from django.conf import settings
+import json
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
 django.setup()
@@ -84,14 +84,13 @@ class InitialPageViewTests(TestCase):
         self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
 
 
-class SaveGroupTests(TestCase):
+class SaveGroupViewTests(TestCase):
     
     def setUp(self):
         self.client = Client()
         self.superuser = User.objects.create_user(username='superuser', password='12345', is_staff=True, is_superuser=True)
         self.staff_user = User.objects.create_user(username='staffuser', password='12345', is_staff=True, is_superuser=False)
         self.normal_user = User.objects.create_user(username='normaluser', password='12345', is_staff=False, is_superuser=False)
-        
         self.url = reverse('save_group') 
 
         
@@ -132,7 +131,7 @@ class SaveGroupTests(TestCase):
         self.assertTrue(Group.objects.filter(name='Test Group').exists())
 
 
-class EditGroupTest(TestCase):
+class EditGroupViewTests(TestCase):
     
     def setUp(self):
         self.client = Client()
@@ -172,7 +171,7 @@ class EditGroupTest(TestCase):
         self.assertEqual(self.group.name, 'New Group Name')
         
 
-class LoadDataTest(TestCase):
+class LoadDataViewTests(TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -242,7 +241,7 @@ class LoadDataTest(TestCase):
         self.assertTrue(Escalation.objects.filter(name='Nome2').exists())
         
         
-class EscalationViewTest(TestCase):
+class EscalationViewTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='12345')
         self.group = Group.objects.create(name='Test Group')
@@ -253,7 +252,7 @@ class EscalationViewTest(TestCase):
         response = self.client.get(url)
 
         messages = [msg.message for msg in get_messages(response.wsgi_request)]
-        self.assertIn(f'Usuário não tem acesso no(a) {self.group.name}.', messages)
+        self.assertIn(f'Usuário não tem permissão no(a) {self.group.name}. Contate o administrador.', messages)
         self.assertRedirects(response, reverse('initial_page'))
 
     def test_user_not_visualizer(self):
@@ -287,14 +286,166 @@ class EscalationViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class CreateEscalationTestView(TestCase):
+class CreateEscalationViewTests(TestCase):
     
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='12345')  
+        self.group = Group.objects.create(name='Test Group')
+        self.escalation = Escalation.objects.create(name='Melissa', level=1, group=self.group)
     
-       
- 
+    def test_method_get(self):
+        self.client.login(username='testuser', password='12345')
+        url = reverse('create_escalation', kwargs={'group_id': self.group.id})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'escalation/create_escalation.html')
+    
+    
+    def test_empty_fields(self):
+        self.client.login(username='testuser', password='12345')
+        url = reverse('create_escalation', kwargs={'group_id': self.group.id})
+        response = self.client.post(url, {'name_new_escalation': 'Melissa', 'position': '', 'phone': '', 'email': 'melissa@atos.net', 'area': 'DWP', 'service': '', 'level': ''})
+        messages = [msg.message for msg in get_messages(response.wsgi_request)]
+        self.assertIn('Preencha todos os campos necessários', messages)
+        self.assertEqual(response.status_code, 400)
+        self.assertTemplateUsed(response, 'escalation/create_escalation.html')
+        
+    
+    def test_empty_fields(self):
+        self.client.login(username='testuser', password='12345')
+        url = reverse('create_escalation', kwargs={'group_id': self.group.id})
+        response = self.client.post(url, {'name': 'Melissa', 'position': '', 'phone': '', 'email': 'melissa@atos.net', 'area': 'DWP', 'service': '', 'level': ''})
+        messages = [msg.message for msg in get_messages(response.wsgi_request)]
+        self.assertIn('Preencha todos os campos necessários', messages)
+        self.assertEqual(response.status_code, 400)
+        self.assertTemplateUsed(response, 'escalation/create_escalation.html')
+        
+    def test_name_group_alredy_exist(self):
+        self.client.login(username='testuser', password='12345')
+        url = reverse('create_escalation', kwargs={'group_id': self.group.id})
+        response = self.client.post(url, {'name_new_escalation': 'Melissa', 'position': 'Estag', 'phone': '1111', 'email': 'melissa@atos.net', 'area': 'DWP', 'service': 'Dev', 'level': 1})
+        messages = [msg.message for msg in get_messages(response.wsgi_request)]
+        self.assertIn('Já existe um escalonamento com este nome.', messages)
+        self.assertEqual(response.status_code, 409)
+        self.assertTemplateUsed(response, 'escalation/create_escalation.html')
+        
+    def test_created_successful(self):
+        self.client.login(username='testuser', password='12345')
+        url = reverse('create_escalation', kwargs={'group_id': self.group.id})
+        response = self.client.post(url, {
+            'name_new_escalation': 'Melissa Neves', 
+            'position': 'Estag', 
+            'phone': '222222', 
+            'email': 'melissa@atos.net', 
+            'area': 'DWP', 
+            'service': 'Dev', 
+            'level': 1
+        }, follow=True)
+
+        messages = [msg.message for msg in get_messages(response.wsgi_request)]
+        self.assertIn('Escalonamento criado com sucesso.', messages)
+
+        expected_url = reverse('escalation', kwargs={'group_id': self.group.id, 'user_id': self.user.id})
+        final_response = self.client.get(expected_url)
+        self.assertEqual(final_response.status_code, 302)
+        self.assertTrue(Escalation.objects.filter(name='Melissa Neves').exists())
+        
+        
+class UpdateEscalationViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.group = Group.objects.create(name='Test Group')
+        self.escalation = Escalation.objects.create(name='Initial Name', level=1, group=self.group)
+        self.client.login(username='testuser', password='12345')
+        self.url = reverse('update_escalation')
+
+    def test_invalid_method(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 405)
+        self.assertJSONEqual(response.content, {"error": "Invalid method"})
+
+    def test_invalid_json(self):
+        response = self.client.post(self.url, "Invalid JSON", content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"error": "Invalid JSON"})
+
+    def test_escalation_not_found(self):
+        data = json.dumps({'id': 9999, 'name': 'Nonexistent Escalation', 'group_id': self.group.id})
+        response = self.client.post(self.url, data, content_type="application/json")
+        self.assertEqual(response.status_code, 404)
+        self.assertJSONEqual(response.content, {"error": "Escalonamento não encontrado"})
+
+    def test_duplicate_escalation_name(self):
+        Escalation.objects.create(name='Duplicate Name', level=2, group=self.group)
+        data = {
+            'id': self.escalation.id, 
+            'name': 'Duplicate Name', 
+            'level': 2,
+            'group_id': self.group.id
+        }
+        response = self.client.post(self.url, json.dumps(data), content_type="application/json")
+        self.assertEqual(response.status_code, 409)
+        expected_url = reverse('escalation', kwargs={'group_id': self.group.id, 'user_id': self.user.id})
+        self.assertJSONEqual(response.content, {"error": "Já existe um escalonamento com esse nome.", "url": expected_url})
+
+    def test_successful_update(self):
+        data = {
+            'id': self.escalation.id, 
+            'name': 'Updated Name', 
+            'position': 'Updated Position', 
+            'phone': '222222', 
+            'email': 'updated@domain.com', 
+            'area': 'Updated Area', 
+            'service': 'Updated Service', 
+            'level': 2,
+            'group_id': self.group.id
+        }
+        response = self.client.post(self.url, json.dumps(data), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        expected_url = reverse('escalation', kwargs={'group_id': self.group.id, 'user_id': self.user.id})
+        self.assertJSONEqual(response.content, {"url": expected_url})
+        self.escalation.refresh_from_db()
+        self.assertEqual(self.escalation.name, 'Updated Name')
+        self.assertEqual(self.escalation.position, 'Updated Position')
+        self.assertEqual(self.escalation.phone, '222222')
+        self.assertEqual(self.escalation.email, 'updated@domain.com')
+        self.assertEqual(self.escalation.area, 'Updated Area')
+        self.assertEqual(self.escalation.service, 'Updated Service')
+        self.assertEqual(self.escalation.level, 2)        
+
+
+class UsedCheckboxViewTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='testuser', password='12345')
+        self.group = Group.objects.create(name='Test Group')
+        self.escalation = Escalation.objects.create(name='Test Escalation', level=1, group=self.group)
+        self.client.login(username='testuser', password='12345')
+        self.url = reverse('is_used')
+
+    def test_invalid_method(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_invalid_json(self):
+        response = self.client.post(self.url, "Invalid JSON", content_type="application/json")
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"error": "Invalid JSON"})
+
+    def test_successful_update(self):
+        data = {
+            'is_used': True,
+            'escalation_id': self.escalation.id
+        }
+        response = self.client.post(self.url, json.dumps(data), content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("success", response.json())
+        self.assertIn("datetime", response.json())
+        self.assertTrue(UserEscalationIsUsed.objects.filter(escalation=self.escalation, user=self.user).exists())
+
+
       
         
         

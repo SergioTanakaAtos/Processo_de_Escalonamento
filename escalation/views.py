@@ -179,7 +179,6 @@ def escalation(request, group_id, user_id):
 def create_escalation(request, group_id):
     group = Group.objects.get(id=group_id)
     if request.method == 'POST':
-        
         name = request.POST.get('name_new_escalation')
         position = request.POST.get('position')
         phone = request.POST.get('phone')
@@ -187,23 +186,21 @@ def create_escalation(request, group_id):
         area = request.POST.get('area')
         service = request.POST.get('service')
         level = request.POST.get('level')
-        
+
         if all([name, position, email, area, service, level]):
-            
             if Escalation.objects.filter(group=group, name=name).exists():
                 messages.error(request, 'Já existe um escalonamento com este nome.')
-                return render(request,'escalation/create_escalation.html', {'group': group})
-            
+                return render(request, 'escalation/create_escalation.html', {'group': group}, status=409)
             else:
                 escalation = Escalation(name=name, position=position, phone=phone, email=email, level=level, area=area, service=service, group=group)
                 escalation.save()
                 messages.success(request, 'Escalonamento criado com sucesso.')
-                url = reverse('escalation', kwargs={'group_id': group_id, 'user_id': get_user(request).id})
+                url = reverse('escalation', kwargs={'group_id': group_id, 'user_id': request.user.id})
                 return redirect(url)
         else:
             messages.error(request, 'Preencha todos os campos necessários')
-            return render(request, 'escalation/create_escalation.html', {'group': group})
-        
+            return render(request, 'escalation/create_escalation.html', {'group': group}, status=400)
+
     return render(request, 'escalation/create_escalation.html', {'group': group})
 
 @login_required(login_url='login')
@@ -212,16 +209,13 @@ def update_escalation(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-
-    
             escalation = Escalation.objects.filter(id=data.get('id')).first()
-            
             group = data.get('group_id')        
             user = get_user(request).id
             url = reverse('escalation', kwargs={'group_id': group, 'user_id': user})
             
             if not escalation:
-                return JsonResponse({"error": "Escalation not found"}, status=404)
+                return JsonResponse({"error": "Escalonamento não encontrado"}, status=404)
             
             
             if Escalation.objects.filter(group=group, name=data.get('name')).exists():
@@ -236,13 +230,10 @@ def update_escalation(request):
             escalation.level = data.get('level')
             escalation.save()
             
-            
             return JsonResponse({"url": url}, status=200)
-
+        
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
        
@@ -266,3 +257,5 @@ def used_checkbox(request):
             return JsonResponse({"error": "Invalid JSON"}, status=400)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+    else:
+        return JsonResponse({"error": "Invalid method"}, status=405)
