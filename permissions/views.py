@@ -57,6 +57,7 @@ def action_permission(request, permission_id, action):
 
     if action == "accepted":
         permission.status = 'activate'
+        user_group.is_visualizer = True
         msg_success = 'aceita'
     else:
         permission.status = 'denied'
