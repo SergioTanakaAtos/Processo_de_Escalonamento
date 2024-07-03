@@ -46,6 +46,14 @@
   text-overflow: ellipsis; 
   height: 37px;
 }
+
+@media (max-width: 576px) {
+  .status-cell {
+    font-size: 12px; /* Reduz o tamanho da fonte em telas menores */
+    padding: 3px 5px; /* Reduz o padding para ocupar menos espaço */
+  }
+}
+
 .access-table {
   width: 100%;
   margin: 20px 0;
@@ -61,21 +69,6 @@ td.request-cell {
   white-space: nowrap; 
 }
 
-@media (max-width: 550px) {
-  .confirm-button,
-  .cancel-button {
-      font-size: 12px; 
-      padding: 5px 15px; 
-      width: 80px;
-      height: 18px;
-      text-align: center;
-      align-items: center;
-      justify-content: center;
-      display: flex;
-      margin-bottom: 10px;
-  }
-}
-
 .btnAdd{
   margin-bottom: 10px;
   border-radius: 5px;
@@ -83,9 +76,29 @@ td.request-cell {
   height: 35px;
   margin-left: 10px;
 }
+
+.edit-controls {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.edit-controls .btn {
+  margin-bottom: 5px;
+  margin-right: 5px;
+}
+
+@media (max-width: 576px) {
+  .edit-controls .btn {
+    width: 100%;
+    margin-right: 0;
+    padding: 3px 8px;
+  }
+}
 </style>
 {% endblock style%}
 {% block content %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <div class="container">
   <h1>Tabela de Dados</h1>
   <div class="d-flex mb-3"> 
@@ -149,11 +162,11 @@ td.request-cell {
       </td>
         <td>
           {% if user.is_superuser or user.is_staff%}
-            <div class="edit-controls">
-                <button class="btn btn-primary edit-button" data-group-id="{{ group.id }}">Editar</button>
-                <button class="btn btn-success confirm-button" style="display: none;">Confirmar</button>
-                <button class="btn btn-danger cancel-button" style="display: none;">Cancelar</button>
-            </div>
+          <div class="edit-controls">
+            <button class="btn btn-primary edit-button" data-group-id="{{ group.id }}">Editar</button>
+            <button class="btn btn-success confirm-button" style="display: none;"><i class="bi bi-check-circle"></i></button>
+            <button class="btn btn-danger cancel-button" style="display: none;"><i class="bi bi-x-circle"></i></button>
+          </div>             
           {% endif %}
             <div class="edit-field" style="display: none;">
                 <input type="text" class="form-control edited-company" value="{{ group }}" data-original-value="{{ group }}" />
