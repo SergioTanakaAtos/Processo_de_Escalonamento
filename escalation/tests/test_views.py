@@ -1,20 +1,14 @@
-from django.test import TestCase, Client, RequestFactory
+from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User, Group
 from escalation.models import LogPermission, Escalation, UserGroupDefault, UserEscalationIsUsed
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 import pandas as pd
-import os
 from io import BytesIO
-import os
-import django
 import json
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
-django.setup()
-
-class InitialPageViewTests(TestCase):
+class InitialPageViewTest(TestCase):
     
     def setUp(self):
         self.client = Client()
@@ -84,7 +78,7 @@ class InitialPageViewTests(TestCase):
         self.assertRedirects(response, f"{reverse('login')}?next={self.url}")
 
 
-class SaveGroupViewTests(TestCase):
+class SaveGroupViewTest(TestCase):
     
     def setUp(self):
         self.client = Client()
@@ -131,7 +125,7 @@ class SaveGroupViewTests(TestCase):
         self.assertTrue(Group.objects.filter(name='Test Group').exists())
 
 
-class EditGroupViewTests(TestCase):
+class EditGroupViewTest(TestCase):
     
     def setUp(self):
         self.client = Client()
@@ -171,7 +165,7 @@ class EditGroupViewTests(TestCase):
         self.assertEqual(self.group.name, 'New Group Name')
         
 
-class LoadDataViewTests(TestCase):
+class LoadDataViewTest(TestCase):
 
     def setUp(self):
         self.client = Client()
@@ -241,7 +235,7 @@ class LoadDataViewTests(TestCase):
         self.assertTrue(Escalation.objects.filter(name='Nome2').exists())
         
         
-class EscalationViewTests(TestCase):
+class EscalationViewTest(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='testuser', password='12345')
         self.group = Group.objects.create(name='Test Group')
@@ -286,7 +280,7 @@ class EscalationViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class CreateEscalationViewTests(TestCase):
+class CreateEscalationViewTest(TestCase):
     
     def setUp(self):
         self.client = Client()
@@ -352,7 +346,7 @@ class CreateEscalationViewTests(TestCase):
         self.assertTrue(Escalation.objects.filter(name='Melissa Neves').exists())
         
         
-class UpdateEscalationViewTests(TestCase):
+class UpdateEscalationViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='12345')
@@ -416,7 +410,7 @@ class UpdateEscalationViewTests(TestCase):
         self.assertEqual(self.escalation.level, 2)        
 
 
-class UsedCheckboxViewTests(TestCase):
+class UsedCheckboxViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.user = User.objects.create_user(username='testuser', password='12345')

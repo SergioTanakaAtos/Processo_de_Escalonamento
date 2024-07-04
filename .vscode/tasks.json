@@ -1,15 +1,22 @@
 {
-	"version": "2.0.0",
-	"tasks": [
-		{
-			"type": "Live Preview",
-			"workspacePath": "c:\\GitHub\\Processo_de_Escalonamento",
-			"problemMatcher": [],
-			"label": "Live Preview: Run Server",
-			"group": {
-				"kind": "test",
-				"isDefault": true
-			}
-		}
-	]
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run Django Unit Tests",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "manage.py",
+                "test"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always"
+            },
+            "problemMatcher": "$tsc"
+        }
+    ]
 }

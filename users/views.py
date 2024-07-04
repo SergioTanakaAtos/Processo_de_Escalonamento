@@ -32,14 +32,14 @@ def register(request):
  
 def login_view(request):
     if request.method == 'POST':
-        # email = request.POST["email"]
         username = request.POST["username"]
         password = request.POST["senha"]
         user = authenticate(request, username=username, password=password)
-        # user = User.objects.filter(email=email,password=password).first()
+        
         if user is not None:
             login(request, user)
             return redirect('initial_page')
+        
         return render(request, 'users/login.html', {'message': 'Usuário ou senha inválidos'})
     return render(request, 'users/login.html')
  
@@ -66,10 +66,14 @@ def get_users(request):
 @login_required(login_url='login')
 def get_user_groups(request):
     if request.method == "GET":
+        id = request.GET.get('id')
+        
+        if not id:
+            return JsonResponse({'error': 'ID do usuário não fornecido'}, status=400)
+        
         try:
-            id = int(request.GET.get('id'))
-            user = User.objects.get(id=id)
-            permission_groups = LogPermission.objects.filter(user_id=id, status = 'activate').values_list('group', flat=True)
+            user = User.objects.get(id=int(id))
+            permission_groups = LogPermission.objects.filter(user_id=id, status='activate').values_list('group', flat=True)
             groups = UserGroupDefault.objects.filter(group__in=permission_groups).values_list('group_id', flat=True)
             data = list(Group.objects.filter(id__in=groups).values('id', 'name'))
 
@@ -80,10 +84,14 @@ def get_user_groups(request):
                 'is_staff': user.is_staff
             }
 
-
             return JsonResponse({'groups': data, 'user': user_data})
-        except (ValueError, ObjectDoesNotExist):
-            return JsonResponse({'error': 'User not found or invalid id'}, status=404)
+        
+        except ValueError:
+            return JsonResponse({'error': 'Formato de ID de usuário inválido'}, status=400)
+        
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Usuário não encontrado'}, status=404)
+
 
 
 
@@ -129,48 +137,8 @@ def update_user_groups(request):
                     log_permission.save()
                     user_group.save()
                 
-            
-            
-  
             return JsonResponse({"message": "Permissão alterada com sucesso"}, status=200)    
 
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON data"}, status=400)
         
-
-
-# def update_level_user(request):
-#     if request.method == "POST":
-#         try:
-#             data = json.loads(request.body)
-#             user = User.objects.filter(id=data.get('id')).first()
-            
-#             if user.is_staff == True:
-#                 user.is_staff = False
-#                 user.save()
-            
-#                 return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
-            
-            
-#             user.is_staff = True
-#             user.save()
-            
-#             permissions = LogPermission.objects.filter(user=user)
-#             permissions.exclude(status='activate').update(status='activate')
-             
-#             user_groups = UserGroupDefault.objects.filter(user=user)
-#             user_groups.filter(is_visualizer=False).update(is_visualizer=True)
-
-#             groups = Group.objects.all()
-            
-#             for group in groups:
-#                 if not UserGroupDefault.objects.filter(user=user, group=group).exists():
-#                     UserGroupDefault.objects.create(user=user, group=group, is_visualizer=True)
-#                 if not LogPermission.objects.filter(user=user, group=group).exists():
-#                     LogPermission.objects.create(user=user, group=group, status='activate')
-
-                
-#             return JsonResponse({"message": "Usuário alterado com sucesso!"}, status=200)
-        
-#         except User.DoesNotExist:
-#             return JsonResponse({"error": "User not found"}, status=404)

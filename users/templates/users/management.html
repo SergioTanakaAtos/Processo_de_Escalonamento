@@ -194,31 +194,6 @@
       }
     }
 
-    {% comment %} async function updateLevel(){
-      const input = document.querySelectorAll('.form-check-input')[0];
-      const user_id = input.id.split(" ")[1];
-
-      const data = {
-        "id": user_id
-      };
-
-      try {
-        const response = await fetch('../update-level-user/', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-        showMessage(result.message, 3000);
-      
-      } catch (error) {
-        showMessage('Erro ao atualizar nível do usuário', 3000);
-      }
-    } {% endcomment %}
-
     const showMessage = (msg, duration) => {
       const message = document.getElementById('message');
       message.innerHTML = msg;

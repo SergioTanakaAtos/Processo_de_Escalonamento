@@ -1,10 +1,3 @@
-import django
-import os
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
-django.setup()
-
-
 from django.test import TestCase
 from escalation.models import Escalation, Group, UserGroupDefault, UserEscalationIsUsed, UserEscalationIsUsed, LogPermission
 from datetime import datetime
