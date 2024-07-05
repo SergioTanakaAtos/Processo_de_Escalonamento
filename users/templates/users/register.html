@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block nav %}
+    {% include 'partial/_nav.html' with page='register'%}
+{% endblock %}
+
 {% block content %}
 <style>
     * {

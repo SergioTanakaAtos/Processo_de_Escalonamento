@@ -13,6 +13,9 @@ from django.contrib import messages
 from escalation import signals
 
 def register(request):
+    if request.user.is_authenticated:
+        return redirect('initial_page')
+    
     form = RegisterForm()
     groups = Group.objects.all()
     if request.method == 'POST':
@@ -28,9 +31,11 @@ def register(request):
             return redirect('login')
         errors = [error[0] for error in form.errors.values()]
         return render(request, 'users/register.html', {'form': form, 'errors': errors, 'groups': groups})
+    
     return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
 def login_view(request):
+
     if request.method == 'POST':
         username = request.POST["username"]
         password = request.POST["senha"]
@@ -41,6 +46,10 @@ def login_view(request):
             return redirect('initial_page')
         
         return render(request, 'users/login.html', {'message': 'Usuário ou senha inválidos'})
+    
+    if request.user.is_authenticated:
+        return redirect('initial_page')
+    
     return render(request, 'users/login.html')
  
 def logout_view(request):

@@ -1,8 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block nav %}
+    {% include 'partial/_nav.html' with page='login'%}
+{% endblock %}
 {% block content %}
 <style>
-      .btn {
+      
+    .btn-form {
         background-color: #073958;
         border: none;
         margin-top: 5px;
@@ -18,7 +23,7 @@
         align-items: center;
     }
  
-    .btn:hover {
+    .btn-form:hover {
         background-color: #022c46;
     }
  
@@ -125,7 +130,7 @@
                     <input type="password" class="form-control" id="senha" name="senha">
                     <img src="{% static 'assets/eye (1).png' %}" onclick="verSenha()" class="senha img-fluid" id="senhaC">
                 </div>
-                <button type="submit" class="mt-3 w-100 btn btn-primary" >Login</button>
+                <button type="submit" class="mt-3 w-100 btn btn-primary btn-form" >Login</button>
             </form>
             <div class="text-center fraseEntrar mt-1">
                 <p>Ainda não tem uma conta? <span class="entreNegrito"
