@@ -35,6 +35,8 @@ def initial_page(request):
         if user_group is not None:
             if user_group.is_visualizer:
                 log_per.status = 'activate'
+            else:
+                log_per.status = 'deactivate'
                 
             if created:
                 log_per.save()
