@@ -84,7 +84,12 @@
             <td>{{ item.service }}</td>
             {% if user.is_superuser or user.is_staff  %}
             <td>
-              <button type="button" class="btn btn-primary edit-btn" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}">Editar</button>
+              <button type="button" class="btn btn-primary edit-btn d-flex justify-content-between align-items-center" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}" style="font-size: 13px; background-color: #fff; border: solid 1px #073958; color: #073958;">
+                <span class="d-flex align-items-center">
+                  <i class="bi bi-pencil-square" style="color: #073958;"></i>
+                  <span class="ml-2">Editar</span>
+                </span>
+              </button>
             </td>
 
             {% endif %}
@@ -145,8 +150,8 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-primary" id="btnSalvarAlteracoes">Salvar Alterações</button>
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+        <button type="button" class="btn btn-primary" id="btnSalvarAlteracoes">Salvar alterações</button>
       </div>
     </div>
   </div>
