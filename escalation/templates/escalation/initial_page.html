@@ -69,14 +69,6 @@ td.request-cell {
   white-space: nowrap; 
 }
 
-.btnAdd{
-  margin-bottom: 10px;
-  border-radius: 5px;
-  border: none;
-  height: 35px;
-  margin-left: 10px;
-}
-
 .edit-controls {
   display: flex;
   flex-wrap: wrap;
@@ -101,30 +93,48 @@ td.request-cell {
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <div class="container">
-  <h1>Tabela de Dados</h1>
-  <div class="d-flex mb-3"> 
-    <input type="text" id="searchInput" class="form-control w-25" placeholder="Pesquisar..." >    
+  
+  <div class="d-flex mb-3 justify-content-between align-items-center" style="width: 100%;">
+
+  <div class="d-flex flex-column title-input">
+    <h1>Tabela de Dados</h1>
+  </div>
+  
+
+  <div class="d-flex w-50 justify-content-end align-items-center">
+
+    <div class="search-container align-items-center mr-2" style="height: 100%;">
+      <span class="input-group-text" id="basic-addon1">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" class="form-control" id="searchInput"  placeholder="Pesquisar..." aria-label="Pesquisar" aria-describedby="basic-addon1">
+    </div>
+    
     {% if user.is_superuser or user.is_staff %}
-      <button id="addButton" class="btnAdd btn-primary">Adicionar</button>
+        <button id="addButton" class="btn-primary ml-2 add-button"> 
+          <i class="bi bi-plus-lg"></i>  
+          Adicionar
+        </button>
     {% endif %}
   </div>
+  
+</div>
 
+<div class="d-flex mb-4">
+  {% if user.is_superuser or user.is_staff %}
+    <form id="upload-form" action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label class="custom-file-upload">
+                <span class="file-icon">📄</span>
+                <span class="file-label">Upload de arquivo</span>
+                <input id="file-input" type="file" name="xlsx_file" accept=".xlsx" required>
+            </label>
+        </div>
+    </form>
+  {% endif %}
+</div>
 
-  <div class="container mt-5">
-    {% if user.is_superuser or user.is_staff %}
-      <form id="upload-form" action="{% url 'load_data' %}" method="POST" enctype="multipart/form-data">
-          {% csrf_token %}
-          <div class="form-group w-25">
-              <label class="custom-file-upload">
-                  <span class="file-icon">📄</span>
-                  <span class="file-label">Upload de arquivo</span>
-                  <input id="file-input" type="file" name="xlsx_file" accept=".xlsx" required>
-              </label>
-          </div>
-      </form>
-    {% endif %}
-  </div>
-   
 
 {% if messages %}
 <div class="mt-3"> 
@@ -145,17 +155,21 @@ td.request-cell {
     <tbody>
       {% for group, state in group_states.items %}
       <tr id="group_row_{{ group.id }}">
-        <td class="editable" data-group-id="{{ group.id }}"><a href={%url 'escalation' group_id=group.id user_id=user.id%}>{{ group }}</a></td>
-          <td>
+        <td class="editable" data-group-id="{{ group.id }}">
+          <a href={%url 'escalation' group_id=group.id user_id=user.id%}>
+            {{ group }}
+          </a></td>
+          
+        <td>
             <div class="status-cell {% if state == 'Permitido' %} bg-success 
-                                    {% elif state == 'Permissão pendente' %} bg-warning 
-                                    {% elif state == 'Não pediu permissão' %} bg-danger 
-                                    {% elif state == 'Permissão negada' %} bg-danger 
+                                    {% elif state == 'Pendente' %} bg-warning 
+                                    {% elif state == 'Restrito' %} bg-danger 
+                                    {% elif state == 'Negado' %} bg-danger 
                                     {% endif %}">
                 {{ state }}
             </div>
           </td>
-      </td>      
+   
       <td class="request-cell">
         {% if state != 'Permitido' and state != 'Permissão pendente' %}
         <a href="{% url 'create-permission' group_id=group.id %}">Solicitar</a>
@@ -300,6 +314,14 @@ td.request-cell {
     });
     
   }
+  if(document.getElementById('searchInput')){
+    document.getElementById('searchInput').addEventListener('change', function() {
+        document.getElementById('searchInput').focus(); 
+    });
+    
+  }
+
+
   
 </script>
 

@@ -3,3 +3,39 @@
 *{
   font-family: "Open Sans", sans-serif;
 }
+
+
+ .search-container {
+    display: flex;
+    align-items: center;
+    width: 300px; 
+    background-color: rgba(225, 225, 225, 0.832); 
+    border: 1px solid #ced4da; 
+    padding: 5px;
+    border-radius: 8px; 
+  }
+
+  .search-container input[type="text"] {
+    flex: 1; 
+    border: none; 
+    outline: none; 
+    background: transparent; 
+    
+  }
+
+  .search-container span{
+    background-color: transparent;
+    border: none;
+  }
+
+  .search-container input[type="text"]:focus {
+    box-shadow: none; 
+  }
+
+  .add-button{
+    background-color: #073958 !important;
+    color: white ;
+    border: none;
+    border-radius: 8px;
+    padding: 13px 30px;
+  }

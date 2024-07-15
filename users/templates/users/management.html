@@ -42,10 +42,15 @@
 
 {% block content %}
   <div class="container">
+    <div class="d-flex mb-4 justify-content-between align-items-center">
     <h1>Controle de acesso</h1>
-    <div class="d-flex mb-3">
-      <input type="text" id="searchInput" class="form-control" placeholder="Pesquisar..." style="max-width: 200px;" />
+    <div class="search-container align-items-center mr-2" style="height: 100%;">
+      <span class="input-group-text" id="basic-addon1">
+        <i class="bi bi-search"></i>
+      </span>
+      <input type="text" class="form-control" id="searchInput"  placeholder="Pesquisar..." aria-label="Pesquisar" aria-describedby="basic-addon1">
     </div>
+  </div>
 
     <div class="alert alert-info ml-3" role="alert" id="message" style="display: none;"></div>
 
