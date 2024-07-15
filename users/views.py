@@ -83,7 +83,7 @@ def get_user_groups(request):
         try:
             user = User.objects.get(id=int(id))
             permission_groups = LogPermission.objects.filter(user_id=id, status='activate').values_list('group', flat=True)
-            groups = UserGroupDefault.objects.filter(group__in=permission_groups).values_list('group_id', flat=True)
+            groups = UserGroupDefault.objects.filter(group__in=permission_groups, is_visualizer=True).values_list('group_id', flat=True)
             data = list(Group.objects.filter(id__in=groups).values('id', 'name'))
 
             user_data = {
