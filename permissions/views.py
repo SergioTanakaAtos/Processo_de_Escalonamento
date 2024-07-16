@@ -66,7 +66,7 @@ def action_permission(request, permission_id, action):
         
     permission.save()
     user_group.save()
-    messages.success(request, f'Permissão {msg_success} com sucesso')
+    messages.success(request, f'Permissão {msg_success}')
     return redirect('permissions')
 
         

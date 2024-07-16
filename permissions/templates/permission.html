@@ -7,8 +7,24 @@
 <style>
   .btn{
     margin-bottom: 12px;
-    padding-bottom: 10px;
+    padding: 10px 15px !important;
+    border-radius: 8px;
+    border: none;
   }
+
+  .confirmar{
+    background-color: rgba(2, 64, 34, 1) !important;
+  }
+  .confirmar:hover{
+    background-color: rgba(3, 90, 48, 1) !important;
+  }
+  .recusar{
+    background-color: rgba(125, 4, 4, 1) !important;
+  }
+  .recusar:hover{
+    background-color: rgba(164, 11, 11, 1) !important;
+  }
+    
 
 </style>
 {% endblock style%}
@@ -35,8 +51,11 @@
                     <div class="desc-permission" style="width: 100%; display: flex; justify-content: space-between;">
                       <p>{{ p.group }}</p>
                       <div class="buttons-permissions">
-                        <a class="btn btn-primary" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">Confirmar</a>
-                        <a class="btn btn-danger" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button">Recusar</a>
+                        <a class="btn btn-primary confirmar" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">
+                          <i class="bi bi-check"></i>
+                          Confirmar</a>
+                        <a class="btn btn-danger recusar" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button"><i class="bi bi-x"></i>
+                          Recusar</a>
                       </div>
                     </div>
                   {% endfor %}

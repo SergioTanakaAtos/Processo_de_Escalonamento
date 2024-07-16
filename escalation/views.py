@@ -35,13 +35,12 @@ def initial_page(request):
         if user_group is not None:
             if user_group.is_visualizer:
                 log_per.status = 'activate'
-            else:
-                log_per.status = 'deactivate'
+        
                 
             if created:
                 log_per.save()
 
-        group_states[group] = states_mapping.get(log_per.status, "Não pediu permissão")
+        group_states[group] = states_mapping.get(log_per.status, "Restrito")
     return render(request, 'escalation/initial_page.html', {'group_states': group_states})
 
 @csrf_exempt
