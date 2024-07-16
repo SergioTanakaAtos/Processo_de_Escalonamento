@@ -206,13 +206,16 @@ td.request-cell {
    
       <td class="request-cell">
         {% if state != 'Permitido' and state != 'Pendente' %}
-        <a class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; color: #073958" href="{% url 'create-permission' group_id=group.id %}">Solicitar</a>
+          <a class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; width: 120px; color: #073958 " href="{% url 'create-permission' group_id=group.id %}"><i class="bi bi-send" style="margin-right: 10px;" ></i>Solicitar</a>
+
+        {% elif state == 'Permitido' and not user.is_superuser and not user.is_staff%}
+        <a class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; width: 120px; color: #073958 " href="{%url 'escalation' group_id=group.id user_id=user.id%}"><i class="bi bi-eye" style="margin-right: 10px;" ></i>Visualizar</a>            
         {% endif %}
       </td>
         <td>
           {% if user.is_superuser or user.is_staff%}
           <div class="edit-controls">
-            <button class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; color: #073958" data-group-id="{{ group.id }}"> <i class="bi bi-pencil-square" style="margin-right: 5px;"></i>Editar</button>
+            <button class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; color: #073958 " data-group-id="{{ group.id }}"> <i class="bi bi-pencil-square" style="margin-right: 10px;"></i>Editar</button>
             <button class="btn btn-success confirm-button" style="display: none;"><i class="bi bi-check-circle"></i></button>
             <button class="btn btn-danger cancel-button" style="display: none;"><i class="bi bi-x-circle"></i></button>
           </div>             
