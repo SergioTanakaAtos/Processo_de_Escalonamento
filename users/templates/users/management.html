@@ -135,12 +135,22 @@
    
           if (data.groups && data.groups.length > 0) {
             data.groups.forEach(group => {
-              $('#groups').append(`
+
+              if(data.user.is_staff){
+                $('#groups').append(`
+                <li class="list-group-item">
+                  <label class="form-check-label" for="groupCheckbox${group.id}">${group.name}</label>
+                </li>`
+              );
+              }else{
+                $('#groups').append(`
                 <li class="list-group-item">
                   <input class="form-check-input me-1 groupUserPermission" type="checkbox" id="${group.id} ${data.user.id}" checked>
                   <label class="form-check-label" for="groupCheckbox${group.id}">${group.name}</label>
                 </li>`
               );
+              }
+              
             });
           } else {
             $('#groups').append('<li class="list-group-item">Nenhum grupo encontrado.</li>');

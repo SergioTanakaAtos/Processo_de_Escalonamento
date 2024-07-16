@@ -64,7 +64,7 @@ def get_users(request):
     for user in users:
         user_data = {
             'id': user.id,
-            'name': user.username,
+            'name': user.username
         }
         users_for_management.append(user_data)
    
