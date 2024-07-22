@@ -122,6 +122,7 @@ td.request-cell {
     color: white !important;
     background-color:  #073958 !important;
 }
+
 </style>
 {% endblock style%}
 
@@ -215,7 +216,10 @@ td.request-cell {
         <td>
           {% if user.is_superuser or user.is_staff%}
           <div class="edit-controls">
-            <button class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; color: #073958 " data-group-id="{{ group.id }}"> <i class="bi bi-pencil-square" style="margin-right: 10px;"></i>Editar</button>
+            <button class="btn btn-primary edit-button" style="background-color: #fff; border: solid 1px #073958; color: #073958 " data-group-id="{{ group.id }}">
+              <i class="bi bi-pencil-square" style="margin-right: 10px;"></i>
+              <span class="d-none d-sm-inline">Editar</span> 
+            </button>
             <button class="btn btn-success confirm-button" style="display: none;"><i class="bi bi-check-circle"></i></button>
             <button class="btn btn-danger cancel-button" style="display: none;"><i class="bi bi-x-circle"></i></button>
           </div>             
