@@ -7,12 +7,12 @@ from .models import Escalation
 from .models import UserGroupDefault
 from .models import LogPermission
 from .models import UserEscalationIsUsed
-from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user 
 from django.utils import timezone
+from asgiref.sync import sync_to_async
 
 from django.http import JsonResponse, HttpResponseRedirect,HttpResponse
 import os
@@ -240,22 +240,27 @@ def update_escalation(request):
        
 
 @csrf_exempt
-def used_checkbox(request):
+async def used_escalation(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
             if data.get('is_used'):
-                user = get_user(request)
+                user = request.user
                 escalation_id = data.get('escalation_id')
-                escalation = Escalation.objects.get(id=escalation_id)
-                date_time = timezone.now()
-                formatted_date_time = date_time.strftime('%Y-%m-%d %H:%M:%S')
 
-                is_used = UserEscalationIsUsed.objects.create(escalation=escalation, user=user, date=formatted_date_time)
-                is_used.save()    
-                return JsonResponse({"success": "Is used updated","datetime":formatted_date_time}, status=200)
+                escalation = await sync_to_async(Escalation.objects.get)(id=escalation_id)
+                is_used = await sync_to_async(UserEscalationIsUsed.objects.create)(
+                    escalation=escalation, 
+                    user=user, 
+                    date=timezone.now()
+                )
+                await sync_to_async(is_used.save)()
+
+                return JsonResponse({"success": "Is used updated"}, status=200)
         except json.JSONDecodeError:
             return JsonResponse({"error": "Invalid JSON"}, status=400)
+        except Escalation.DoesNotExist:
+            return JsonResponse({"error": "Escalation not found"}, status=404)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
     else:

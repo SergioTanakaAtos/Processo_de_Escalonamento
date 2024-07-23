@@ -44,6 +44,7 @@
     {% endfor %}
     {% endif %}
  
+    
     <div id="datetime-display" class="container mt-3" style="display: none;">
       <div class="alert alert-info" role="alert">
           <p id="datetime-info" class="mb-0"></p>
@@ -93,8 +94,9 @@
 
             {% endif %}
             <td>
-              <input type="checkbox" class="escalation-checkbox" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)">
+              <button type="button" class="escalation-button" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)">Usar Escalonamento</button>
             </td>
+          
         {% endfor %}
       </tbody>
     {% endif %}
@@ -263,39 +265,49 @@
     }, duration);
   }
   
-  function updateIsUsed(checkbox) {
-    var escalation_id = $(checkbox).data('escalation-id');
-    console.log('Escalation ID:', escalation_id); 
-    if (checkbox.checked) {
-        $.ajax({
-            url: "{% url 'is_used' %}",
-            type: 'POST',
+  async function updateIsUsed(button) {
+    const escalation_id = $(button).data('escalation-id');
+    console.log('Escalation ID:', escalation_id);
+
+    try {
+        const response = await fetch("{% url 'is_used' %}", {
+            method: 'POST',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}',
                 'Content-Type': 'application/json'
             },
-            data: JSON.stringify({ 
+            body: JSON.stringify({ 
                 is_used: true,
                 escalation_id: escalation_id 
-            }),
-            success: function(response) {
-                console.log('Checkbox atualizado com sucesso');
-                console.log('Data e hora:', response.datetime);
-
-                $('#datetime-info').text('Escalonamento usado às: ' + response.datetime);
-                $('#datetime-display').show(); 
-                setTimeout(function() {
-                  window.location.reload();
-                }, 3000);
-            },
-            error: function(error) {
-                console.error('Erro ao atualizar checkbox:', error);
-                window.location.reload()
-            }
+            })
         });
+
+        if (!response.ok) {
+            throw new Error('Erro ao utilizar');
+        }
+
+        console.log('Botão atualizado com sucesso');
+        
+        const currentDateTime = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+        $('#datetime-info').text('Escalonamento usado às: ' + currentDateTime);
+        $('#datetime-display').fadeIn(); 
+        
+        
+        setTimeout(function() {
+            $('#datetime-display').fadeOut(); 
+            window.location.reload();
+        }, 2000);
+    } catch (error) {
+        console.error(error.message);
+        $('#datetime-info').text('Erro ao atualizar: ' + error.message);
+        $('#datetime-display').fadeIn(); 
+        
+        
+        setTimeout(function() {
+            $('#datetime-display').fadeOut(); 
+        }, 3000);
     }
 }
-
   window.addEventListener('load', function() {
     const alerts = document.querySelectorAll('.alert');
     if (alerts.length > 0) {
