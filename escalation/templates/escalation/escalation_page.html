@@ -11,6 +11,30 @@
     .fade-out {
         opacity: 0;
     }
+
+    .table-striped-custom tbody tr.even {
+      background-color: rgba(7, 57, 88, 0.2);
+    }
+    
+    .table-striped-custom tbody tr.odd {
+      background-color: #E1E1E1; 
+    }
+
+    .escalation-button{
+      border-radius: 5px;
+      border: solid 1px #073958;
+      background-color: #fff;
+      color: #073958;
+      font-size: 13px;
+      height: 32px;
+      width: 50px;
+      transition: 0.3s ease-in;
+    }
+
+    .escalation-button:hover{
+      color: white !important;
+      background-color:  #073958 !important;
+  }
 </style>
 {% endblock style %}
 
@@ -50,57 +74,55 @@
           <p id="datetime-info" class="mb-0"></p>
       </div>
     </div>
-  <table id="escalationTable" class="table table-striped">
-    {% if message %}
-      <tr>
-        <td colspan="7">{{ message }}</td>
-      </tr>
-    {% else %}
-      <thead>
+    <table id="escalationTable" class="table table-striped-custom">
+      {% if message %}
         <tr>
-          <th>Nome</th>
-          <th>Cargo</th>
-          <th>Área</th>
-          <th>Email</th>
-          <th>Telefone</th>
-          <th>Nível</th>
-          <th>Serviço</th>
-          {% if user.is_superuser or user.is_staff  %}
-            <th>Ações</th>
-          {% endif %}
-          <th>Usou?</th>
-          
+          <td colspan="8">{{ message }}</td>
         </tr>
-      </thead>
-      <tbody>
-        {% for item in escalation %}
+      {% else %}
+        <thead>
           <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.position }}</td>
-            <td>{{ item.area }}</td>
-            <td><a href="mailto:{{ item.email }}">{{ item.email }}</a></td>
-            <td>{{ item.phone }}</td>
-            <td>{{ item.level }}</td>
-            <td>{{ item.service }}</td>
+            <th>Nome</th>
+            <th>Cargo</th>
+            <th>Área</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Nível</th>
+            <th>Serviço</th>
             {% if user.is_superuser or user.is_staff  %}
-            <td>
-              <button type="button" class="btn btn-primary edit-btn d-flex justify-content-between align-items-center" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}" style="font-size: 13px; background-color: #fff; border: solid 1px #073958; color: #073958;">
-                <span class="d-flex align-items-center">
-                  <i class="bi bi-pencil-square" style="color: #073958;"></i>
-                  <span class="ml-2">Editar</span>
-                </span>
-              </button>
-            </td>
-
+              <th>Ações</th>
             {% endif %}
-            <td>
-              <button type="button" class="escalation-button" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)">Usar Escalonamento</button>
-            </td>
-          
-        {% endfor %}
-      </tbody>
-    {% endif %}
-  </table>
+            <th>Usou?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in escalation %}
+            <tr class="{% cycle 'even' 'odd' %}">
+              <td>{{ item.name }}</td>
+              <td>{{ item.position }}</td>
+              <td>{{ item.area }}</td>
+              <td><a style="color: #073958; text-decoration: underline;" href="mailto:{{ item.email }}">{{ item.email }}</a></td>
+              <td>{{ item.phone }}</td>
+              <td>{{ item.level }}</td>
+              <td>{{ item.service }}</td>
+              {% if user.is_superuser or user.is_staff  %}
+                <td>
+                  <button type="button" class="btn btn-primary edit-btn d-flex justify-content-between align-items-center" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}" style="font-size: 13px; background-color: #fff; border: solid 1px #073958; color: #073958;">
+                    <span class="d-flex align-items-center">
+                      <i class="bi bi-pencil-square" style="color: #073958;"></i>
+                      <span class="ml-2">Editar</span>
+                    </span>
+                  </button>
+                </td>
+              {% endif %}
+              <td>
+                <button type="button" class="escalation-button" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)"> <i class="bi bi-check"></i></button>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      {% endif %}
+    </table>    
 </div>
 
 <!-- Modal de Edição -->

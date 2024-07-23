@@ -43,7 +43,7 @@
           {% for user in users %}
             <div class="card">
               <div class="card-header" id="heading{{ user.id }}">
-                <h2 class="mb-0"><button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ user.id }}" aria-expanded="false" aria-controls="collapse{{ user.id }}">{{ user.name }}</button></h2>
+                <h2 class="mb-0"><button style="color: black;" class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ user.id }}" aria-expanded="false" aria-controls="collapse{{ user.id }}">{{ user.name }}</button></h2>
               </div>
               <div id="collapse{{ user.id }}" class="collapse {{ user.id }}" aria-labelledby="heading{{ user.id }}" data-parent="#accordionExample">
                 <div class="card-body">
@@ -51,7 +51,7 @@
                     <div class="desc-permission" style="width: 100%; display: flex; justify-content: space-between;">
                       <p>{{ p.group }}</p>
                       <div class="buttons-permissions">
-                        <a class="btn btn-primary confirmar" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">
+                        <a style="border: none;" class="btn btn-primary confirmar" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">
                           <i class="bi bi-check"></i>
                           Confirmar</a>
                         <a class="btn btn-danger recusar" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button"><i class="bi bi-x"></i>
