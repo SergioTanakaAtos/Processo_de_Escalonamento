@@ -131,10 +131,10 @@
             <form id="cadastroForm" method="post" action="{% url 'register' %}">
                 {% csrf_token %}
    
-                <div class="mb-1 labels">
+                {% comment %} <div class="mb-1 labels">
                     <label for="{{ form.username.id }}" class="form-label">{{ form.username.label }}:</label>
                     {{ form.username }}
-                </div>
+                </div> {% endcomment %}
                 <div class="mb-1 labels">
                     <label for="{{ form.email.id }}" class="form-label">{{ form.email.label }}:</label>
                     {{ form.email }}
