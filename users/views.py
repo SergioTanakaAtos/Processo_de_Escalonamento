@@ -13,27 +13,38 @@ from django.contrib import messages
 from escalation import signals
 
 
+
+
+
+
+
+
 @csrf_exempt
 def register(request):
     if request.user.is_authenticated:
         return redirect('initial_page')
     
-    form = RegisterForm()
     groups = Group.objects.all()
+    form = RegisterForm(request.POST or None)  
+    
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
         if form.is_valid():
             permission_groups = request.POST.getlist('permissions')[0].split(',')
             user = form.save()
-            if permission_groups == ['']:
-                return redirect('login')
-            for group_id in permission_groups:
-                group = Group.objects.get(id=group_id)
-                LogPermission.objects.create(user=user, group=group,status='pending')
-            return redirect('login')
-        errors = [error[0] for error in form.errors.values()]
-        return render(request, 'users/register.html', {'form': form, 'errors': errors, 'groups': groups})
-    
+            if permission_groups != ['']:  
+                for group_id in permission_groups:
+                    try:
+                        group = Group.objects.get(id=group_id)
+                        LogPermission.objects.create(user=user, group=group, status='pending')
+                    except Group.DoesNotExist:
+                        messages.error(request, f'O grupo com ID {group_id} não existe.')
+            messages.success(request, f'Cadastro bem-sucedido! Seu nome de usuário é {user.username}.')
+            return redirect('login')  
+        else:
+            errors = [error[0] for error in form.errors.values()]
+            for error in errors:
+                messages.error(request, error) 
+
     return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
 @csrf_exempt

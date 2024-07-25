@@ -9,11 +9,10 @@ class RegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'password1', 'password2']
-    
+        fields = ['email', 'password1', 'password2']
+
     def __init__(self, *args, **kwargs):
         super(RegisterForm, self).__init__(*args, **kwargs)
-        self.fields['username'].label = 'Usuário'
         self.fields['email'].label = 'E-mail'
         self.fields['password1'].label = 'Senha'
         self.fields['password2'].label = 'Confirmar senha'
@@ -25,7 +24,6 @@ class RegisterForm(UserCreationForm):
                 'invalid': f'{field.label} inválido.',
             }
 
-        self.fields['username'].error_messages['unique'] = 'Este nome de usuário já está em uso.'
         self.fields['email'].error_messages['unique'] = 'Este e-mail já está em uso.'
         
         self.fields['password1'].error_messages.update({
@@ -63,12 +61,12 @@ class RegisterForm(UserCreationForm):
             raise forms.ValidationError("Este e-mail já está em uso.")
         return email
     
-    def clean_permissions(self):
-        permissions = self.cleaned_data.get('permissions')
-        if not permissions:
-            return []
-        group_names = permissions.split(',')
-        groups = Group.objects.filter(name__in=group_names)
-        if len(groups) != len(group_names):
-            raise forms.ValidationError("Um ou mais grupos fornecidos não são válidos.")
-        return [group.id for group in groups]
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        email = self.cleaned_data.get('email')
+        username = email.split('@')[0]
+        user.username = username
+
+        if commit:
+            user.save()
+        return user
