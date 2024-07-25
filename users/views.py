@@ -13,12 +13,6 @@ from django.contrib import messages
 from escalation import signals
 
 
-
-
-
-
-
-
 @csrf_exempt
 def register(request):
     if request.user.is_authenticated:

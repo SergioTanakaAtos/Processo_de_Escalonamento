@@ -173,7 +173,9 @@ def escalation(request, group_id, user_id):
     if not escalation:
         messages.error(request, 'Não há escalonamento cadastrado para este grupo.')
     
-    return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation})
+    cargos = most_commonly_used_attribute('position')
+    area = most_commonly_used_attribute('area')
+    return render(request, 'escalation/escalation_page.html', {'group': group, 'escalation': escalation, 'common_positions': cargos, 'common_areas': area})
 
 
 @login_required(login_url='login')
