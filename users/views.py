@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from escalation import signals
 
+
+@csrf_exempt
 def register(request):
     if request.user.is_authenticated:
         return redirect('initial_page')
@@ -34,6 +36,7 @@ def register(request):
     
     return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
+@csrf_exempt
 def login_view(request):
 
     if request.method == 'POST':

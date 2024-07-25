@@ -46,7 +46,13 @@
 
             <div class="mb-3">
                 <label for="position" class="form-label">Cargo: </label>
-                <input type="text" class="form-control" id="position" placeholder="Digite a posição" name="position">
+
+                <select class="custom-select" placeholder="Selecione um cargo" name="position" id="position">
+                    {% for position in common_positions %}
+                        <option value="{{ position }}">{{ position }}</option>
+                    {% endfor %}
+                </select>
+                {% comment %} <input type="text" class="form-control" id="position" placeholder="Digite a posição" name="position"> {% endcomment %}
             </div>
 
             <div class="mb-3">
@@ -56,7 +62,12 @@
 
             <div class="mb-3">
                 <label for="area" class="form-label">Área: </label>
-                <input type="text" class="form-control" id="area" placeholder="Digite a área" name="area">
+                <select class="custom-select" placeholder="Selecione uma área" name="area" id="area">
+                    {% for area in common_areas %}
+                        <option value="{{ area }}">{{ area }}</option>
+                    {% endfor %}
+                </select>
+                {% comment %} <input type="text" class="form-control" id="area" placeholder="Digite a área" name="area"> {% endcomment %}
             </div>
 
             <div class="mb-3">

@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user 
 from django.utils import timezone
 from asgiref.sync import sync_to_async
-
+from .signals import most_commonly_used_attribute
 from django.http import JsonResponse, HttpResponseRedirect,HttpResponse
 import os
 from django.conf import settings
@@ -201,8 +201,12 @@ def create_escalation(request, group_id):
         else:
             messages.error(request, 'Preencha todos os campos necessários')
             return render(request, 'escalation/create_escalation.html', {'group': group}, status=400)
-
-    return render(request, 'escalation/create_escalation.html', {'group': group})
+    
+  
+    cargos = most_commonly_used_attribute('position')
+    area = most_commonly_used_attribute('area')
+    
+    return render(request, 'escalation/create_escalation.html', {'group': group, 'common_positions': cargos, 'common_areas': area})
 
 @login_required(login_url='login')
 @csrf_exempt

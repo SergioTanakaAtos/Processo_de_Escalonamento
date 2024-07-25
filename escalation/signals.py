@@ -2,7 +2,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.contrib.auth.models import User
 from django.contrib.auth.models import Group
-from .models import UserGroupDefault
+from .models import UserGroupDefault, Escalation
 
 @receiver(post_save, sender=User)
 def update_usergroup_default(sender, instance, created, **kwargs):
@@ -32,3 +32,14 @@ def update_existing_superusers_and_staff(sender, instance, created, **kwargs):
                 user_group_default.save()
 
 post_save.connect(update_existing_superusers_and_staff, sender=Group)
+
+
+def most_commonly_used_attribute(attribute):
+    query = Escalation.objects.values_list(attribute, flat=True)
+    attributes = set()
+
+    for q in query:
+        if q not in attributes:
+            attributes.add(q)
+
+    return list(attributes)
