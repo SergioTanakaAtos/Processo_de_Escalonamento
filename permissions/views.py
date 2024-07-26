@@ -44,30 +44,30 @@ def save_permission(request, group_id):
 
 @login_required(login_url='login')      
 def action_permission(request, permission_id, action):
-    permission = LogPermission.objects.filter(id=permission_id).get()
-    try:
-        user_group = UserGroupDefault.objects.get(group=permission.group, user=permission.user)
-    except UserGroupDefault.DoesNotExist:
-        user_group = UserGroupDefault.objects.create(group=permission.group, user=permission.user)
-    
-    user_group = UserGroupDefault.objects.filter(
-            group=permission.group,
-            user=permission.user
-        ).get()
-
-    if action == "accepted":
-        permission.status = 'activate'
-        user_group.is_visualizer = True
-        msg_success = 'aceita'
-    else:
-        permission.status = 'denied'
-        user_group.is_visualizer = False
-        msg_success = 'negada'
+    if request.method == 'GET':
+        permission = LogPermission.objects.filter(id=permission_id).get()
+        try:
+            user_group = UserGroupDefault.objects.get(group=permission.group, user=permission.user)
+        except UserGroupDefault.DoesNotExist:
+            user_group = UserGroupDefault.objects.create(group=permission.group, user=permission.user)
         
-    permission.save()
-    user_group.save()
-    messages.success(request, f'Permissão {msg_success}')
-    return redirect('permissions')
+        user_group = UserGroupDefault.objects.filter(
+                group=permission.group,
+                user=permission.user
+            ).get()
+
+        if action == "accepted":
+            permission.status = 'activate'
+            user_group.is_visualizer = True
+            msg_success = 'aceito'
+        else:
+            permission.status = 'denied'
+            user_group.is_visualizer = False
+            msg_success = 'negado'
+            
+        permission.save()
+        user_group.save()
+        return JsonResponse({'message': f'Acesso a empresa {permission.group.name} {msg_success}'}, status=200)
 
         
 

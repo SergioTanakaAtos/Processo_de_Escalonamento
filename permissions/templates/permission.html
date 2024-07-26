@@ -4,30 +4,40 @@
   Permissões
 {% endblock %}
 {% block style %}
-<style>
-  .btn{
-    margin-bottom: 12px;
-    padding: 10px 15px !important;
-    border-radius: 8px;
-    border: none;
-  }
+  <style>
 
-  .confirmar{
-    background-color: rgba(2, 64, 34, 1) !important;
-  }
-  .confirmar:hover{
-    background-color: rgba(3, 90, 48, 1) !important;
-  }
-  .recusar{
-    background-color: rgba(125, 4, 4, 1) !important;
-  }
-  .recusar:hover{
-    background-color: rgba(164, 11, 11, 1) !important;
-  }
+    .fade-out {
+      transform: translateX(0);
+      opacity: 1;
+      transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+    }
+  
+    .fade-out.hidden {
+      transform: translateX(100%); 
+      opacity: 0;
+    }
+
+    .btn {
+      margin-bottom: 12px;
+      padding: 10px 15px !important;
+      border-radius: 8px;
+      border: none;
+    }
     
-
-</style>
-{% endblock style%}
+    .confirmar {
+      background-color: rgba(2, 64, 34, 1) !important;
+    }
+    .confirmar:hover {
+      background-color: rgba(3, 90, 48, 1) !important;
+    }
+    .recusar {
+      background-color: rgba(125, 4, 4, 1) !important;
+    }
+    .recusar:hover {
+      background-color: rgba(164, 11, 11, 1) !important;
+    }
+  </style>
+{% endblock %}
 {% block content %}
   <div class="container">
     <h1 class="mb-4">Permissões</h1>
@@ -46,16 +56,13 @@
                 <h2 class="mb-0"><button style="color: black;" class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{ user.id }}" aria-expanded="false" aria-controls="collapse{{ user.id }}">{{ user.name }}</button></h2>
               </div>
               <div id="collapse{{ user.id }}" class="collapse {{ user.id }}" aria-labelledby="heading{{ user.id }}" data-parent="#accordionExample">
-                <div class="card-body">
+                <div class="card-body" id="card_body_{{ user.id }}">
                   {% for p in user.per %}
-                    <div class="desc-permission" style="width: 100%; display: flex; justify-content: space-between;">
+                    <div class="desc-permission mb-2 groups fade-out" id="group_{{ p.id }}" style="width: 100%; display: flex; justify-content: space-between;">
                       <p>{{ p.group }}</p>
-                      <div class="buttons-permissions">
-                        <a style="border: none;" class="btn btn-primary confirmar" href="{% url 'action-permission' action='accepted' permission_id=p.id %}" role="button">
-                          <i class="bi bi-check"></i>
-                          Confirmar</a>
-                        <a class="btn btn-danger recusar" href="{% url 'action-permission' action='denied' permission_id=p.id %}" role="button"><i class="bi bi-x"></i>
-                          Recusar</a>
+                      <div class="buttons-permissions d-flex justify-content-center align-items-center" style="width: 250px; gap: 10px;" id="btt_group_{{ p.id }}">
+                        <button style="border: none;" class="btn btn-primary confirmar" id="confirmar_{{ p.id }}" onclick="updatePermission({{ p.id }}, 'accepted', {{ user.id }})"><i class="bi bi-check"></i> Confirmar</button>
+                        <button class="btn btn-danger recusar" id="recusar_{{ p.id }}" onclick="updatePermission({{ p.id }}, 'denied', {{ user.id }})"><i class="bi bi-x"></i> Recusar</button>
                       </div>
                     </div>
                   {% endfor %}
@@ -75,4 +82,45 @@
       </figure>
     {% endif %}
   </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+
+    function updatePermission(permissionId, action, userId) {
+      var group = document.getElementById(`group_${permissionId}`)
+      var cardBody = document.getElementById(`card_body_${userId}`)
+      
+      fetch(`/permission/${action}/${permissionId}/`, {
+        method: 'GET'
+      })
+        .then((response) => response.json())
+        .then((data) => {
+    
+
+          var type_alert = action === 'accepted' ? 'success' : 'danger';
+          group.innerHTML = `
+          <div class="alert alert-${type_alert} d-flex justify-content-center align-items-center" style="width: 100%" role="alert">
+              ${data.message}
+          </div>`;
+          
+          setTimeout(() => {
+              group.classList.add('hidden');
+              setTimeout(() => {
+                  group.remove()
+                  var children = cardBody.getElementsByClassName('desc-permission');
+                  if(children.length === 0){
+                    window.location.reload()
+                  }
+              }, 500);
+          }, 1000);
+
+        })
+        .catch((error) => {
+          console.error('Error:', error)
+        })
+      
+    }
+  
+  </script>
 {% endblock %}
