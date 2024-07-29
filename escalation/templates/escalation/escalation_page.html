@@ -1,59 +1,60 @@
 {% extends 'base.html' %}
-{% block title %}Escalonamento{% endblock title %}
+{% block title %}
+  Escalonamento
+{% endblock %}
 
 {% block style %}
-<style>
-
-  #alert-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1050; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    pointer-events: none; 
-}
-
-.alert {
-    position: relative;
-    margin: 0;
-    padding: 15px;
-    border-radius: 5px;
-    width: 100%;
-    max-width: 500px;
-    text-align: center;
-    font-size: 16px;
-    color: #fff;
-    transition: opacity 0.5s ease;
-}
-
-.alert-info {
-    background-color: #17a2b8; 
-}
-
-.alert-danger {
-    background-color: #dc3545; 
-}
-
+  <style>
+    #alert-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1050;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      pointer-events: none;
+    }
+    
     .alert {
-        transition: opacity 0.5s ease-out;
+      position: relative;
+      margin: 0;
+      padding: 15px;
+      border-radius: 5px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+      font-size: 16px;
+      color: #fff;
+      transition: opacity 0.5s ease;
     }
-
+    
+    .alert-info {
+      background-color: #17a2b8;
+    }
+    
+    .alert-danger {
+      background-color: #dc3545;
+    }
+    
+    .alert {
+      transition: opacity 0.5s ease-out;
+    }
+    
     .fade-out {
-        opacity: 0;
+      opacity: 0;
     }
-
+    
     .table-striped-custom tbody tr.even {
       background-color: rgba(7, 57, 88, 0.2);
     }
     
     .table-striped-custom tbody tr.odd {
-      background-color: #E1E1E1; 
+      background-color: #e1e1e1;
     }
-
-    .escalation-button{
+    
+    .escalation-button {
       border-radius: 5px;
       border: solid 1px #073958;
       background-color: #fff;
@@ -63,63 +64,61 @@
       width: 50px;
       transition: 0.3s ease-in;
     }
-
-    .escalation-button:hover{
+    
+    .escalation-button:hover {
       color: white !important;
-      background-color:  #073958 !important;
-  }
-
-  .escalation-button.green {
-    background-color: #28a745; 
-    color: #fff;
-    border: solid 1px #28a745;
-}
-
-.responsive-container {
-  margin-left: 0;
-}
-
-@media (max-width: 768px) {
-  .responsive-container {
-    margin-left: 10px;
-  }
-}
-</style>
-{% endblock style %}
+      background-color: #073958 !important;
+    }
+    
+    .escalation-button.green {
+      background-color: #28a745;
+      color: #fff;
+      border: solid 1px #28a745;
+    }
+    
+    .responsive-container {
+      margin-left: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .responsive-container {
+        margin-left: 10px;
+      }
+    }
+  </style>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-  <br>
+  <div class="container">
+    <br />
 
-  <div class="d-flex mb-4 justify-content-between align-items-center">
-    <h2>Escalonamento > {{ group.name }}</h2>
+    <div class="d-flex mb-4 justify-content-between align-items-center">
+      <h2>Escalonamento > {{ group.name }}</h2>
 
-
-    {% if user.is_superuser or user.is_staff  %}
-      <div class="d-flex">
-        <a href="{% url 'create_escalation' group_id=group.id %} " class="add-button btn-primary">
-          <i class="bi bi-plus-lg"></i>
-          Adicionar</a>
-      </div>
+      {% if user.is_superuser or user.is_staff %}
+        <div class="d-flex">
+          <a href="{% url 'create_escalation' group_id=group.id %} " class="add-button btn-primary">
+            <i class="bi bi-plus-lg"></i>
+            Adicionar
+          </a>
+        </div>
       {% else %}
-      <br>
-    {% endif %}
-
-  </div>
- 
-
-  
-  {% if messages %}
-    {% for message in messages %}
-    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
-        {{ message }}
+        <br />
+      {% endif %}
     </div>
-    {% endfor %}
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags %}
+            
+            alert-{{ message.tags }}
+          {% endif %}">{{ message }}</div>
+      {% endfor %}
     {% endif %}
- 
+
     {% comment %} <div id="datetime-display" class="container mt-3" style="display: none;">
       <div class="alert alert-info" role="alert">
-          <p id="datetime-info" class="mb-0"></p>
+        <p id="datetime-info" class="mb-0"></p>
       </div>
     </div> {% endcomment %}
     <table id="escalationTable" class="table table-striped-custom">
@@ -137,10 +136,13 @@
             <th>Telefone</th>
             <th>Nível</th>
             <th>Serviço</th>
-            {% if user.is_superuser or user.is_staff  %}
+            {% if user.is_superuser or user.is_staff %}
               <th>Ações</th>
             {% endif %}
             <th>Usou?</th>
+            {% if user.is_superuser or user.is_staff %}
+              <th>Qtd</th>
+            {% endif %}
           </tr>
         </thead>
         <tbody>
@@ -149,11 +151,13 @@
               <td>{{ item.name }}</td>
               <td>{{ item.position }}</td>
               <td>{{ item.area }}</td>
-              <td><a style="color: #073958; text-decoration: underline;" href="mailto:{{ item.email }}">{{ item.email }}</a></td>
+              <td>
+                <a style="color: #073958; text-decoration: underline;" href="mailto:{{ item.email }}">{{ item.email }}</a>
+              </td>
               <td>{{ item.phone }}</td>
               <td>{{ item.level }}</td>
               <td>{{ item.service }}</td>
-              {% if user.is_superuser or user.is_staff  %}
+              {% if user.is_superuser or user.is_staff %}
                 <td>
                   <button type="button" class="btn btn-primary edit-btn d-flex justify-content-between align-items-center" data-toggle="modal" data-target="#exampleModal" data-id="{{ item.id }}" data-name="{{ item.name }}" data-position="{{ item.position }}" data-area="{{ item.area }}" data-email="{{ item.email }}" data-phone="{{ item.phone }}" data-level="{{ item.level }}" data-service="{{ item.service }}" style="font-size: 13px; background-color: #fff; border: solid 1px #073958; color: #073958;">
                     <span class="d-flex align-items-center">
@@ -164,253 +168,254 @@
                 </td>
               {% endif %}
               <td>
-                <button type="button" class="escalation-button" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)"> <i class="bi bi-check"></i></button>
+                <button type="button" class="escalation-button" data-escalation-id="{{ item.id }}" onclick="updateIsUsed(this)"><i class="bi bi-check"></i></button>
               </td>
+              {% if user.is_superuser or user.is_staff %}
+                <td>
+                  {% if item.total_hoje %}
+                    {{ item.total_hoje }}
+                  {% else %}
+                    0
+                  {% endif %}
+                </td>
+              {% endif %}
             </tr>
           {% endfor %}
         </tbody>
       {% endif %}
-    </table>    
-</div>
+    </table>
+  </div>
 
-<!-- Modal de Edição -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Editar Escalonamento</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form method="post">
-          {% csrf_token %}
+  <!-- Modal de Edição -->
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Editar Escalonamento</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>
+        <div class="modal-body">
+          <form method="post">
+            {% csrf_token %}
 
-          <div id="message" style="display: none;"></div>
+            <div id="message" style="display: none;"></div>
 
-          <input type="hidden" id="inp_id" value="">
-          <div class="form-group">
-            <label for="inp_name" class="col-form-label">Nome:</label>
-            <input type="text" class="form-control" id="inp_name" name="name">
-          </div>
-          <div class="form-group">
-            <label for="inp_position" class="col-form-label">Cargo:</label>
-            <select class="custom-select" placeholder="Selecione um cargo" name="position" id="inp_position">
-              {% for position in common_positions %}
+            <input type="hidden" id="inp_id" value="" />
+            <div class="form-group">
+              <label for="inp_name" class="col-form-label">Nome:</label>
+              <input type="text" class="form-control" id="inp_name" name="name" />
+            </div>
+            <div class="form-group">
+              <label for="inp_position" class="col-form-label">Cargo:</label>
+              <select class="custom-select" placeholder="Selecione um cargo" name="position" id="inp_position">
+                {% for position in common_positions %}
                   <option value="{{ position }}">{{ position }}</option>
-              {% endfor %}
-          </select>
-          </div>
-          <div class="form-group">
-            <label for="inp_area" class="col-form-label">Área:</label>
-            <select class="custom-select" placeholder="Selecione uma área" name="area" id="inp_area">
-              {% for area in common_areas %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="inp_area" class="col-form-label">Área:</label>
+              <select class="custom-select" placeholder="Selecione uma área" name="area" id="inp_area">
+                {% for area in common_areas %}
                   <option value="{{ area }}">{{ area }}</option>
-              {% endfor %}
-          </select>
-          </div>
-          <div class="form-group">
-            <label for="inp_email" class="col-form-label">Email:</label>
-            <input type="email" class="form-control" id="inp_email" name="email">
-          </div>
-          <div class="form-group">
-            <label for="inp_phone" class="col-form-label">Telefone:</label>
-            <input type="text" class="form-control" id="inp_phone" name="phone">
-          </div>
-          <div class="form-group">
-            <label for="inp_level" class="col-form-label">Nível:</label>
-            <input type="text" class="form-control" id="inp_level" name="level">
-          </div>
-          <div class="form-group">
-            <label for="inp_service" class="col-form-label">Serviço:</label>
-            <input type="text" class="form-control" id="inp_service" name="service">
-          </div>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
-        <button type="button" class="btn btn-primary" id="btnSalvarAlteracoes">Salvar alterações</button>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="inp_email" class="col-form-label">Email:</label>
+              <input type="email" class="form-control" id="inp_email" name="email" />
+            </div>
+            <div class="form-group">
+              <label for="inp_phone" class="col-form-label">Telefone:</label>
+              <input type="text" class="form-control" id="inp_phone" name="phone" />
+            </div>
+            <div class="form-group">
+              <label for="inp_level" class="col-form-label">Nível:</label>
+              <input type="text" class="form-control" id="inp_level" name="level" />
+            </div>
+            <div class="form-group">
+              <label for="inp_service" class="col-form-label">Serviço:</label>
+              <input type="text" class="form-control" id="inp_service" name="service" />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary" id="btnSalvarAlteracoes">Salvar alterações</button>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock %}
 
 {% block script %}
-<script>
-  $(document).ready(function() {
-    var params = {}; 
-
-  
-    $('.edit-btn').on('click', function() {
-      $('#exampleModal #inp_id').val($(this).data('id'));
-      $('#exampleModal #inp_name').val($(this).data('name'));
-      $('#exampleModal #inp_position').val($(this).data('position'));
-      $('#exampleModal #inp_area').val($(this).data('area'));
-      $('#exampleModal #inp_email').val($(this).data('email'));
-      $('#exampleModal #inp_phone').val($(this).data('phone'));
-      $('#exampleModal #inp_level').val($(this).data('level'));
-      $('#exampleModal #inp_service').val($(this).data('service'));
-
-      
-      params.id = $(this).data('id');
-      params.name = $(this).data('name');
-      params.position = $(this).data('position');
-      params.area = $(this).data('area');
-      params.email = $(this).data('email');
-      params.phone = $(this).data('phone');
-      params.level = $(this).data('level');
-      params.service = $(this).data('service');
-    });
-
-  
-    $('#btnSalvarAlteracoes').on('click', async function() {
-
-      const group_id = "{{ group.id }}";
-      console.log(group_id)
-
-      try {
-        const data = {
-          id: $('#exampleModal #inp_id').val(),
-          name: $('#exampleModal #inp_name').val(),
-          position: $('#exampleModal #inp_position').val(),
-          area: $('#exampleModal #inp_area').val(),
-          email: $('#exampleModal #inp_email').val(),
-          phone: $('#exampleModal #inp_phone').val(),
-          level: $('#exampleModal #inp_level').val(),
-          service: $('#exampleModal #inp_service').val(),
-          group_id: group_id
-        };
-
-        const response = await fetch("../../../update_escalation/", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken 
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json()
-        const message = document.getElementById('message');
-        const alertDiv = document.createElement('div');
-
-        if (response.ok) {
-          alertDiv.className = 'alert alert-success';
-          alertDiv.role = 'alert';
-          alertDiv.style.width = '100%';
-          alertDiv.textContent = `Escalanomento editado com sucesso!`;
-          
-          message.append(alertDiv);
-          message.style.display = 'flex';
-          
-          setTimeout(() => {
-            window.location.href = result.url;
-          }, 2000);
-
-        } else {
-
-            if(response.status === 409){
-
-              alertDiv.className = 'alert alert-danger';
-              alertDiv.role = 'alert';
-              alertDiv.style.width = '100%';
-              alertDiv.textContent = result.error;
-              
-              message.append(alertDiv);
-              message.style.display = 'flex';
-            
-              setTimeout(() => {
-                message.removeChild(alertDiv)
-              }, 2000);
-            }
-          console.error('Falha ao atualizar dados:', response.status);
-        }
-      } catch (error) {
-        console.error('Erro:', error);
-      }
-    });
-  });
-
-  const showMessage = (msg, duration) => {
-    const message = document.getElementById('message');
-    message.innerHTML = msg;
-    message.style.display = 'flex';
+  <script>
+    $(document).ready(function () {
+      var params = {}
     
-    setTimeout(() => {
-      message.style.display = 'none';
-    }, duration);
-  }
-  
-  function showAlert(message, type) {
-    const alertContainer = document.getElementById('alert-container');
-
-    const existingAlert = alertContainer.querySelector('.alert');
-    if (existingAlert) {
-        existingAlert.remove();
-    }
-
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type}`;
-    alertDiv.role = 'alert';
-    alertDiv.textContent = message;
-
-    alertContainer.appendChild(alertDiv);
-
-    setTimeout(() => {
-        alertDiv.style.opacity = '0';
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 500); 
-    }, 5000);
-}
-
-async function updateIsUsed(button) {
-    const escalation_id = $(button).data('escalation-id');
-    console.log('Escalation ID:', escalation_id);
-
-    button.classList.add('green');
-
-    try {
-        const response = await fetch("{% url 'is_used' %}", {
+      $('.edit-btn').on('click', function () {
+        $('#exampleModal #inp_id').val($(this).data('id'))
+        $('#exampleModal #inp_name').val($(this).data('name'))
+        $('#exampleModal #inp_position').val($(this).data('position'))
+        $('#exampleModal #inp_area').val($(this).data('area'))
+        $('#exampleModal #inp_email').val($(this).data('email'))
+        $('#exampleModal #inp_phone').val($(this).data('phone'))
+        $('#exampleModal #inp_level').val($(this).data('level'))
+        $('#exampleModal #inp_service').val($(this).data('service'))
+    
+        params.id = $(this).data('id')
+        params.name = $(this).data('name')
+        params.position = $(this).data('position')
+        params.area = $(this).data('area')
+        params.email = $(this).data('email')
+        params.phone = $(this).data('phone')
+        params.level = $(this).data('level')
+        params.service = $(this).data('service')
+      })
+    
+      $('#btnSalvarAlteracoes').on('click', async function () {
+        const group_id = '{{ group.id }}'
+        console.log(group_id)
+    
+        try {
+          const data = {
+            id: $('#exampleModal #inp_id').val(),
+            name: $('#exampleModal #inp_name').val(),
+            position: $('#exampleModal #inp_position').val(),
+            area: $('#exampleModal #inp_area').val(),
+            email: $('#exampleModal #inp_email').val(),
+            phone: $('#exampleModal #inp_phone').val(),
+            level: $('#exampleModal #inp_level').val(),
+            service: $('#exampleModal #inp_service').val(),
+            group_id: group_id
+          }
+    
+          const response = await fetch('../../../update_escalation/', {
             method: 'POST',
             headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-                'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrftoken
             },
-            body: JSON.stringify({ 
-                is_used: true,
-                escalation_id: escalation_id 
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Erro ao utilizar');
+            body: JSON.stringify(data)
+          })
+    
+          const result = await response.json()
+          const message = document.getElementById('message')
+          const alertDiv = document.createElement('div')
+    
+          if (response.ok) {
+            alertDiv.className = 'alert alert-success'
+            alertDiv.role = 'alert'
+            alertDiv.style.width = '100%'
+            alertDiv.textContent = `Escalanomento editado com sucesso!`
+    
+            message.append(alertDiv)
+            message.style.display = 'flex'
+    
+            setTimeout(() => {
+              window.location.href = result.url
+            }, 2000)
+          } else {
+            if (response.status === 409) {
+              alertDiv.className = 'alert alert-danger'
+              alertDiv.role = 'alert'
+              alertDiv.style.width = '100%'
+              alertDiv.textContent = result.error
+    
+              message.append(alertDiv)
+              message.style.display = 'flex'
+    
+              setTimeout(() => {
+                message.removeChild(alertDiv)
+              }, 2000)
+            }
+            console.error('Falha ao atualizar dados:', response.status)
+          }
+        } catch (error) {
+          console.error('Erro:', error)
         }
-
-        const currentDateTime = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-        showAlert('Escalonamento usado às: ' + currentDateTime, 'info');
-        
-    } catch (error) {
-        console.error(error.message);
-        showAlert('Erro ao atualizar: ' + error.message, 'danger');
-    } finally {
+      })
+    })
+    
+    const showMessage = (msg, duration) => {
+      const message = document.getElementById('message')
+      message.innerHTML = msg
+      message.style.display = 'flex'
+    
+      setTimeout(() => {
+        message.style.display = 'none'
+      }, duration)
+    }
+    
+    function showAlert(message, type) {
+      const alertContainer = document.getElementById('alert-container')
+    
+      const existingAlert = alertContainer.querySelector('.alert')
+      if (existingAlert) {
+        existingAlert.remove()
+      }
+    
+      const alertDiv = document.createElement('div')
+      alertDiv.className = `alert alert-${type}`
+      alertDiv.role = 'alert'
+      alertDiv.textContent = message
+    
+      alertContainer.appendChild(alertDiv)
+    
+      setInterval(() => {
+        window.location.reload()
+      }, 1500)
+    
+      setTimeout(() => {
+        alertDiv.style.opacity = '0'
         setTimeout(() => {
-            button.classList.remove('green');
-        }, 5000);
+          alertDiv.remove()
+        }, 500)
+      }, 3000)
     }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    const alertContainer = document.getElementById('alert-container');
-    if (!alertContainer) {
-        const newAlertContainer = document.createElement('div');
-        newAlertContainer.id = 'alert-container';
-        document.body.appendChild(newAlertContainer);
+    
+    async function updateIsUsed(button) {
+      const escalation_id = $(button).data('escalation-id')
+      console.log('Escalation ID:', escalation_id)
+    
+      button.classList.add('green')
+    
+      try {
+        const response = await fetch("{% url 'is_used' %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            is_used: true,
+            escalation_id: escalation_id
+          })
+        })
+    
+        if (!response.ok) {
+          throw new Error('Erro ao utilizar')
+        }
+    
+        const currentDateTime = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })
+        showAlert('Escalonamento usado às: ' + currentDateTime, 'info')
+      } catch (error) {
+        console.error(error.message)
+        showAlert('Erro ao atualizar: ' + error.message, 'danger')
+      } finally {
+        setTimeout(() => {
+          button.classList.remove('green')
+        }, 5000)
+      }
     }
-});
-
-</script>
+    
+    document.addEventListener('DOMContentLoaded', () => {
+      const alertContainer = document.getElementById('alert-container')
+      if (!alertContainer) {
+        const newAlertContainer = document.createElement('div')
+        newAlertContainer.id = 'alert-container'
+        document.body.appendChild(newAlertContainer)
+      }
+    })
+  </script>
 {% endblock %}
-

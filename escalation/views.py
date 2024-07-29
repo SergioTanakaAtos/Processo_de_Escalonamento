@@ -21,6 +21,8 @@ from django.core.files.storage import FileSystemStorage
 import pandas as pd
 from django.contrib import messages
 import json
+from django.db.models import Count, OuterRef, Subquery
+from django.utils import timezone
 
 @login_required(login_url='login')
 def initial_page(request):
@@ -169,7 +171,15 @@ def escalation(request, group_id, user_id):
         messages.error(request, f'Usuário não tem permissão no(a) {group}. Contate o administrador.')
         return redirect('initial_page')
 
-    escalation = Escalation.objects.filter(group=group)
+
+    today = timezone.now().date()
+    
+    user_escalation_today = UserEscalationIsUsed.objects.filter(
+        escalation_id=OuterRef('id'),
+        date__date=today).values('escalation_id').annotate(total=Count('id')).values('total')
+    
+    escalation = Escalation.objects.filter(group=group).annotate(total_hoje=Subquery(user_escalation_today))
+
     if not escalation:
         messages.error(request, 'Não há escalonamento cadastrado para este grupo.')
     
@@ -271,3 +281,4 @@ async def used_escalation(request):
             return JsonResponse({"error": str(e)}, status=500)
     else:
         return JsonResponse({"error": "Invalid method"}, status=405)
+
