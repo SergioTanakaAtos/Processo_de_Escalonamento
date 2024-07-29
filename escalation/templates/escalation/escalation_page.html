@@ -4,6 +4,39 @@
 {% block style %}
 <style>
 
+  #alert-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; 
+}
+
+.alert {
+    position: relative;
+    margin: 0;
+    padding: 15px;
+    border-radius: 5px;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    font-size: 16px;
+    color: #fff;
+    transition: opacity 0.5s ease;
+}
+
+.alert-info {
+    background-color: #17a2b8; 
+}
+
+.alert-danger {
+    background-color: #dc3545; 
+}
+
     .alert {
         transition: opacity 0.5s ease-out;
     }
@@ -35,6 +68,22 @@
       color: white !important;
       background-color:  #073958 !important;
   }
+
+  .escalation-button.green {
+    background-color: #28a745; 
+    color: #fff;
+    border: solid 1px #28a745;
+}
+
+.responsive-container {
+  margin-left: 0;
+}
+
+@media (max-width: 768px) {
+  .responsive-container {
+    margin-left: 10px;
+  }
+}
 </style>
 {% endblock style %}
 
@@ -68,12 +117,11 @@
     {% endfor %}
     {% endif %}
  
-    
-    <div id="datetime-display" class="container mt-3" style="display: none;">
+    {% comment %} <div id="datetime-display" class="container mt-3" style="display: none;">
       <div class="alert alert-info" role="alert">
           <p id="datetime-info" class="mb-0"></p>
       </div>
-    </div>
+    </div> {% endcomment %}
     <table id="escalationTable" class="table table-striped-custom">
       {% if message %}
         <tr>
@@ -295,9 +343,34 @@
     }, duration);
   }
   
-  async function updateIsUsed(button) {
+  function showAlert(message, type) {
+    const alertContainer = document.getElementById('alert-container');
+
+    const existingAlert = alertContainer.querySelector('.alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.role = 'alert';
+    alertDiv.textContent = message;
+
+    alertContainer.appendChild(alertDiv);
+
+    setTimeout(() => {
+        alertDiv.style.opacity = '0';
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 500); 
+    }, 5000);
+}
+
+async function updateIsUsed(button) {
     const escalation_id = $(button).data('escalation-id');
     console.log('Escalation ID:', escalation_id);
+
+    button.classList.add('green');
 
     try {
         const response = await fetch("{% url 'is_used' %}", {
@@ -316,41 +389,28 @@
             throw new Error('Erro ao utilizar');
         }
 
-        console.log('Botão atualizado com sucesso');
-        
         const currentDateTime = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
-        $('#datetime-info').text('Escalonamento usado às: ' + currentDateTime);
-        $('#datetime-display').fadeIn(); 
+        showAlert('Escalonamento usado às: ' + currentDateTime, 'info');
         
-        
-        setTimeout(function() {
-            $('#datetime-display').fadeOut(); 
-            window.location.reload();
-        }, 2000);
     } catch (error) {
         console.error(error.message);
-        $('#datetime-info').text('Erro ao atualizar: ' + error.message);
-        $('#datetime-display').fadeIn(); 
-        
-        
-        setTimeout(function() {
-            $('#datetime-display').fadeOut(); 
-        }, 3000);
+        showAlert('Erro ao atualizar: ' + error.message, 'danger');
+    } finally {
+        setTimeout(() => {
+            button.classList.remove('green');
+        }, 5000);
     }
 }
-  window.addEventListener('load', function() {
-    const alerts = document.querySelectorAll('.alert');
-    if (alerts.length > 0) {
-        setTimeout(function() {
-            alerts.forEach(function(alert) {
-                alert.classList.add('fade-out');
-                setTimeout(function() {
-                    alert.style.display = 'none';
-                }, 500);
-            });
-        }, 3000);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const alertContainer = document.getElementById('alert-container');
+    if (!alertContainer) {
+        const newAlertContainer = document.createElement('div');
+        newAlertContainer.id = 'alert-container';
+        document.body.appendChild(newAlertContainer);
     }
-  });
+});
+
 </script>
 {% endblock %}
 
