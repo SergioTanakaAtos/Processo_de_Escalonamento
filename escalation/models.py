@@ -44,7 +44,7 @@ class LogPermission(models.Model):
     ]
  
     status = models.CharField(
-        max_length=11,
+        max_length=20,
         choices=STATUS_CHOICES,
         default='desactivate',
     )
