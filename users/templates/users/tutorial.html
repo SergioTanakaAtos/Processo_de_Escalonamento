@@ -1,0 +1,315 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block nav %}
+    {% include 'partial/_nav.html' with page='register' %}
+{% endblock %}
+
+{% block content %}
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+    .registerContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+    .registerContainer h1 {
+        font-weight: bold;
+        font-size: 2rem;
+        text-align: center;
+        margin-bottom: 20px;
+        color: #073958;
+    }
+
+    .textImageWrapper, .permissionWrapper, .initialWrapper, .managementWrapper {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        margin-top: 15px;
+    }
+
+    .textImageWrapper {
+        flex-direction: row;
+    }
+
+    .permissionWrapper {
+        flex-direction: row-reverse;
+        margin-top: 25px;
+        align-items: center;
+    }
+
+    .initialWrapper {
+        flex-direction: row;
+        margin-top: 50px;
+        align-items: center;
+    }
+
+    .managementWrapper {
+        flex-direction: row-reverse;
+    }
+
+    .textImageWrapper img, .permissionWrapper img, .initialImage, .managementWrapper img {
+        width: 500px;
+        margin-right: 20px;
+        box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+    }
+
+    .textImageWrapper p, .permissionWrapper p, .initialText p {
+        margin: 0;
+        width: auto;
+        margin-top: 10px;
+    }
+
+    .permissionText, .initialText, .managementText {
+        flex: 1;
+    }
+
+    .permissionImage, .initialImage {
+        width: 500px;
+    }
+
+    .initialText h1, .initialText h3, .registerContainer h1, .permissionWrapper h1, .managementWrapper h1 {
+        text-align: center;
+        color: #073958;
+    }
+
+    .initialText h1 {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    .initialText h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .initialText p {
+        font-size: 1rem;
+        color: black;
+        margin: 0;
+    }
+
+    @media (max-width: 767px) {
+        .textImageWrapper, .permissionWrapper, .initialWrapper, .managementWrapper {
+            flex-direction: column;
+            align-items: center;
+            width: 95%;
+            margin-bottom: 10px;
+        }
+
+        .textImageWrapper img, .permissionWrapper img, .initialImage, .managementWrapper img {
+            width: 100%;
+            max-width: none;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .textImageWrapper p, .permissionWrapper p, .initialText p {
+            width: 100%;
+            text-align: justify;
+            margin-bottom: 10px;
+        }
+
+        .permissionText, .initialText, .managementText {
+            order: 1;
+            width: 100%;
+            text-align: justify;
+        }
+
+        .permissionImage, .initialImage, .managementImage {
+            width: 100%;
+            order: 2;
+            margin-bottom: 10px;
+        }
+
+        .permissionWrapper {
+            flex-direction: column;
+            align-items: center;
+            margin-top: 25px;
+        }
+
+        .permissionWrapper img {
+            order: 2;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .permissionWrapper .permissionText {
+            order: 1;
+            width: 100%;
+            text-align: justify;
+        }
+
+        .managementWrapper {
+            flex-direction: column;
+            align-items: center;
+            text-align: justify;
+            padding-bottom: 10px;
+        }
+
+        .managementWrapper img {
+            width: 100%;
+            max-width: none;
+            margin-left: 0;
+            margin-bottom: 10px;
+        }
+    }
+
+    span {
+        font-weight: bold;
+        color: #073958;
+    }
+
+    .logoAtosDeveloped {
+        position: static;
+        bottom: 0;
+        right: 0;
+        margin-bottom: 10px;
+        margin-right: 35px;
+        margin-left: 1100px;
+        width: 80px;
+    }
+
+    @media (max-width: 767px) {
+        .logoAtosDeveloped{
+        display: static;
+        margin-left: 50px;
+        }
+    }
+
+    .fade-in {
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    }
+    
+    .fade-in.visible {
+        opacity: 1;
+    }
+</style>
+
+<form method="POST" action="{% url 'tutorial' %}"></form>
+
+<div class="registerContainer fade-in">
+    <h1>Como se cadastrar no Sistema de Escalonamento?</h1>
+    <div class="textImageWrapper">
+        <p>
+            • O campo <span>e-mail</span> deverá aceitar apenas e-mails com o domínio <span>ATOS</span>, exemplo: @atos.net; Todo o conteúdo escrito antes do <span style="font-weight: bold;">@</span> será o seu usuário para <span style="font-weight: bold;">login</span>.<br><br>
+            • A senha deve possuir caracteres especiais <span>#@!$%*</span>, letras maiúsculas, minúsculas e números. A senha não deve ser parecida com o seu user ou e-mail; <br><br>
+            • Confirme a senha para prosseguir e autenticar; <br><br>
+        </p>
+        <img src="{% static 'assets/registerT.png' %}" alt="register">
+    </div>
+    <div class="permissionWrapper fade-in">
+        <div class="permissionText">
+            <p style="font-weight: normal; color: black; font-size: 1rem;">
+                • O campo <span style="font-weight: bold;">Permissões</span> permite que você selecione os grupos necessários para consultar e utilizar os escalonamentos. Após o seu cadastro, as permissões solicitadas serão enviadas para o administrador, que decidirá se aceita ou recusa o seu pedido. Enquanto a decisão não é tomada, sua solicitação permanecerá pendente. <br><br>
+                Verifique com atenção os grupos selecionados para assegurar que atendem às suas necessidades. Se precisar de ajustes nas permissões, entre em contato com o administrador.
+            </p>
+        </div>
+        <img src="{% static 'assets/permissionT.png' %}" alt="permission" class="permissionImage">
+    </div>
+
+    <h1 style="margin-top: 50px; fade-in">Funcionalidades de Usuários em Tabela de Dados</h1>
+    <div class="initialWrapper fade-in">
+        <div class="initialText">
+            <h3 style="font-weight: bold; color: #073958; font-size: 1.15rem; margin-top: 15px;">Ações Disponíveis para Staff e Administradores</h3>
+            <p><span>1. Adicionar Novas Empresas</span>: <br>
+                <span>Staff</span> e <span>administradores</span> têm permissão para adicionar novas empresas ao sistema. <br>
+                <span>2. Upload de Dados via Planilha XLSX</span>: <br>
+                Esses usuários podem fazer o upload de dados de uma planilha no formato XLSX para o sistema. <br>
+                <span>Acesso a Todos os Escalonamentos</span>: <br>
+                Tanto staff quanto administradores possuem acesso <span>total</span> a todos os escalonamentos disponíveis no sistema.</p>
+        </div>
+        <img src="{% static 'assets/initialT.png' %}" alt="initialpage" class="initialImage">
+    </div>
+
+    <h1 style="margin-top: 60px; fade-in">Solicitação de acesso para outros usuários</h1>
+    <div class="managementWrapper fade-in">
+        <div class="managementText">
+            <p style="margin-top: 20px;"><span>Solicitação de acesso ao Escalonamento</span>: <br> <br>
+                Usuários que não têm acesso a um escalonamento específico podem clicar no botão <span>"Solicitar"</span> para enviar um pedido ao administrador. O administrador analisará a solicitação e decidirá se concede ou recusa o acesso. Se aprovado, o usuário obterá permissão para acessar o escalonamento solicitado. Se recusado, o usuário será notificado e poderá buscar mais informações ou fazer novas solicitações.</p>
+        </div>
+        <img src="{% static 'assets/requestT.png' %}" alt="request" class="managementImage">
+    </div>
+
+    <div class="registerContainer fade-in" style="margin-top: 60px;">
+        <h1>Interface de Escalonamento</h1>
+        <div class="textImageWrapper">
+            <p>
+                A interface de escalonamento refere-se aos níveis de escalação de uma determinada empresa. Somente usuários com permissões de <span>staff</span> ou <span>superuser</span> terão acesso às seguintes funcionalidades: <br> <br>
+                • Adicionar ou editar escalonamento; <br>
+                • Visualizar a quantidade de vezes que uma escalação foi utilizada no dia. <br> <br>
+                A função <span>"Usou?"</span> é utilizada para indicar quando uma escalação foi usada para resolver um incidente ou problema.
+            </p>
+            <img src="{% static 'assets/escalationT.png' %}" alt="escalation" class="textImageImage">
+        </div>
+    </div>
+
+    <h1 style="margin-top: 40px; fade-in">Controle de Acesso</h1>
+    <div class="managementWrapper fade-in">
+        <div class="managementText">
+            <p>A interface de controle de acesso exibe todos os usuários do sistema, exceto os superusers. As funcionalidades incluem: <br><br>
+                <span>Ver acessos</span>: Ao clicar nesta opção, são exibidas as informações do usuário, se ele é um staff e quais empresas ele tem acesso. É possível: <br>
+                • Editar os acessos e o nível do usuário. <br>
+                • Se o usuário for <span>staff</span>, ele terá acesso a todas as empresas. <br>
+                • Se for um <span>usuário comum</span>, poderá ser removido ou ter acesso concedido às empresas disponíveis.</p>
+        </div>
+        <img src="{% static 'assets/managementT.png' %}" alt="management" class="managementImage">
+    </div>
+
+    <div class="registerContainer fade-in" style="margin-top: 60px;">
+        <h1>Permissões de usuários</h1>
+        <div class="textImageWrapper">
+            <p>
+                A interface de permissões organiza as solicitações de acesso por usuário. Ao clicar no nome de um usuário, você pode visualizar as empresas para as quais ele solicitou acesso. As ações disponíveis são: <br> <br>
+                • <span>Confirmar</span>: Aprovar a solicitação, concedendo ao usuário permissão para visualizar e interagir com as empresas selecionadas. <br>
+                • <span>Recusar</span>: Negar a solicitação, mantendo o usuário sem acesso às empresas solicitadas; <br> <br>
+                Além disso, usuários com o perfil de <span>Staff</span> têm acesso completo a todas as empresas e suas funcionalidades.
+            </p>
+            <img style="margin-top: 15px;" src="{% static 'assets/permissionUserT.png' %}" alt="permissions" class="textImageImage">
+        </div>
+    </div>
+    <div class="logoAtosDeveloped">
+        <img src="{% static 'assets/image (1).png' %}" alt="Logo">
+    </div>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const fadeElements = document.querySelectorAll('.fade-in');
+    
+        const elementInView = (el, dividend = 1) => {
+            const elementTop = el.getBoundingClientRect().top;
+            const elementBottom = el.getBoundingClientRect().bottom;
+    
+            return (
+                elementTop <= (window.innerHeight || document.documentElement.clientHeight) * dividend &&
+                elementBottom >= 0
+            );
+        };
+    
+        const handleScroll = () => {
+            fadeElements.forEach(el => {
+                if (elementInView(el)) {
+                    el.classList.add('visible');
+                }
+             });
+        };
+    
+        window.addEventListener('scroll', handleScroll);
+        handleScroll(); 
+    });
+    </script>
+    
+{% endblock content %}

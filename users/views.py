@@ -12,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from escalation import signals
 
+def tutorial(request):
+    return render(request, 'users/tutorial.html')
 
 @csrf_exempt
 def register(request):
