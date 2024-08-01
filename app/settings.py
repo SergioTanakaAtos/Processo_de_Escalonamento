@@ -91,12 +91,14 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 DATABASES = {
   'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'escalonamento',
-        'USER': 'root',
-        'PASSWORD': 'Atos@2024',
-        'HOST':'localhost',
-        'PORT':'3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        # 'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'escalonamento',
+        # 'USER': 'root',
+        # 'PASSWORD': 'Atos@2024',
+        # 'HOST':'localhost',
+        # 'PORT':'3306',
     }
 }
 
