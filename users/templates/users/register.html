@@ -168,14 +168,14 @@
                 <button type="submit" class="btn btn-primary btn-block">Cadastrar</button>
             </form>
             {% if errors %}
-                <div class="alert alert-danger mt-3" role="alert">
-                    <ul>
-                        {% for error in errors %}
-                            <li>{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {% endif %}
+            <div class="alert alert-danger mt-3" role="alert">
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
             <div class="text-center mt-2">
                 <p>Já possui uma conta? <a style="text-decoration: none; color: #073958; font-weight: bolder;" href="{% url 'login' %}">Entre!</a></p>
             </div>

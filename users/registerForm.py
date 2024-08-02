@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 
 class RegisterForm(UserCreationForm):
     error_messages = {
@@ -42,8 +42,13 @@ class RegisterForm(UserCreationForm):
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
-        if len(password2) > 0 and len(password2) < 8:
+
+        if len(password2) < 8:
             raise forms.ValidationError("A senha deve conter no mínimo 8 caracteres.")
+
+        if not any(char in '!@#$%^&*()_+' for char in password2):
+            raise forms.ValidationError("A senha deve conter pelo menos um caractere especial: !@#$%^&*()_+")
+
         return password2
 
     def clean(self):

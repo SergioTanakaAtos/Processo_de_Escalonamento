@@ -19,10 +19,10 @@ def tutorial(request):
 def register(request):
     if request.user.is_authenticated:
         return redirect('initial_page')
-    
+
     groups = Group.objects.all()
-    form = RegisterForm(request.POST or None)  
-    
+    form = RegisterForm(request.POST or None)
+
     if request.method == 'POST':
         if form.is_valid():
             permission_groups = request.POST.getlist('permissions')[0].split(',')
@@ -35,11 +35,10 @@ def register(request):
                     except Group.DoesNotExist:
                         messages.error(request, f'O grupo com ID {group_id} não existe.')
             messages.success(request, f'Cadastro bem-sucedido! Seu nome de usuário é {user.username}.')
-            return redirect('login')  
+            return redirect('login')
         else:
-            errors = [error[0] for error in form.errors.values()]
-            for error in errors:
-                messages.error(request, error) 
+            errors = [error for error in form.errors.values()]
+            return render(request, 'users/register.html', {'form': form, 'groups': groups, 'errors': errors})
 
     return render(request, 'users/register.html', {'form': form, 'groups': groups})
  
