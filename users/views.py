@@ -34,7 +34,7 @@ def register(request):
                         LogPermission.objects.create(user=user, group=group, status='pending')
                     except Group.DoesNotExist:
                         messages.error(request, f'O grupo com ID {group_id} não existe.')
-            messages.success(request, f'Cadastro bem-sucedido! Seu nome de usuário é {user.username}.')
+            messages.success(request, f'Cadastro bem-sucedido! Seu nome de usuário é {user.username}')
             return redirect('login')
         else:
             errors = [error for error in form.errors.values()]
