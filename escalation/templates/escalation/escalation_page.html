@@ -152,7 +152,10 @@
               <td>{{ item.position }}</td>
               <td>{{ item.area }}</td>
               <td>
-                <a style="color: #073958; text-decoration: underline;" href="mailto:{{ item.email }}">{{ item.email }}</a>
+                <a style="color: #073958; text-decoration: underline;"
+                   href="mailto:{{ item.email }}?subject=Escalonamento%20de%20Chamado%20-%20[XXXXXXXXXXX]&body=Prezados,%0A%0AGostaria%20de%20informar%20sobre%20o%20escalonamento%20do%20chamado%20abaixo%20para%20a%20devida%20aten%C3%A7%C3%A3o%20e%20provid%C3%AAncias:%0A%0ANumero%20do%20Chamado%3A%20[Inserir%20n%C3%BAmero%20do%20chamado]%0A%0ADescri%C3%A7%C3%A3o%20do%20Problema%3A%20[Breve%20descri%C3%A7%C3%A3o%20do%20problema]%0A%0AT%C3%A9cnico%20Respons%C3%A1vel%3A%20[Nome%20do%20t%C3%A9cnico%20atualmente%20respons%C3%A1vel]%0A%0AN%C3%ADvel%20de%20Prioridade%3A%20[Alta%2FM%C3%ADdia%2FBaixa]%0A%0AMotivo%20do%20Escalonamento%3A%20[Raz%C3%A3o%20para%20o%20escalonamento]%0A%0AT%C3%A9cnico%20para%20Escalonamento%3A%20[Nome%20do%20novo%20t%C3%A9cnico%20designado]%0A%0AObserva%C3%A7%C3%B5es%20Adicionais%3A%20[Quaisquer%20observa%C3%A7%C3%B5es%20adicionais]%0A%0AAgrade%C3%A7o%20antecipadamente%20pela%20aten%C3%A7%C3%A3o%20e%20colabora%C3%A7%C3%A3o.">
+                  {{ item.email }}
+                </a>
               </td>
               <td>{{ item.phone }}</td>
               <td>{{ item.level }}</td>
